@@ -1,0 +1,62 @@
+# Taskin
+
+Organize no seu ritmo.
+
+Taskin é um sistema pessoal de produtividade — tarefas, notas, calendário e um dashboard com indicadores — construído como uma aplicação **single-file HTML/CSS/JS**, sem backend, sem build step e sem dependências externas de servidor. Todos os seus dados ficam com você.
+
+## ✨ Recursos
+
+- **Dashboard** — cards de alerta (vencidas, hoje, esta semana), tarefas vencidas mais antigas, indicadores de produtividade (taxa de conclusão, sequência de dias, gráfico de barras dos últimos 14 dias), distribuição de tarefas por prioridade, últimas notas e próximas agendas.
+- **Tarefas** — categorias, tags, prioridade, status, recorrência, subtarefas, comentários, ID único sequencial, filtros e agrupamento configurável (período, status, prioridade, tags, categoria).
+- **Notas** — editor de texto rico (negrito, itálico, sublinhado, títulos, listas), anexos de imagem, cores, fixar, arquivar, tags, e associação com tarefas e agendas.
+- **Calendário** — visões de dia, semana e mês, recorrência de eventos, cor por tag, exportação de convite `.ics`, associação bidirecional com tarefas, fim de semana destacado, densidade de exibição configurável na visão semanal.
+- **Configurações** — perfil, categorias, tags, personalização (modo escuro/claro, dia de início da semana) e gerenciamento do arquivo de dados.
+- **Modo escuro** completo, com a barra lateral sempre no esquema escuro por padrão visual.
+- **Barra lateral expansível/minimizável**, com seleção rápida de categoria mesmo no modo compacto.
+
+## 💾 Como os dados são salvos
+
+Taskin não tem servidor nem banco de dados externo. Os dados ficam num único arquivo `.json` local, salvo através da **File System Access API** (Chrome/Edge), com:
+
+- Reconexão automática ao arquivo entre sessões (via handle salvo no IndexedDB do navegador).
+- Fallback para `localStorage` em navegadores sem suporte à File System Access API.
+- Autosave com debounce, e commit forçado ao trocar de aba, minimizar ou fechar o navegador.
+
+Nenhum dado é enviado para fora do seu navegador.
+
+## 🚀 Como usar
+
+### Opção 1 — Abrir localmente
+
+Basta baixar o `index.html` e abrir no navegador (Chrome ou Edge recomendados, para suporte completo à File System Access API).
+
+### Opção 2 — GitHub Pages
+
+1. Suba este repositório no GitHub.
+2. Em **Settings → Pages**, selecione a branch e a raiz (`/`) como origem.
+3. Acesse a URL gerada pelo GitHub Pages — o `index.html` já é o ponto de entrada.
+
+Na primeira execução, o sistema vai pedir para você criar ou selecionar um arquivo `.json` onde os dados serão salvos.
+
+## 🖥️ Compatibilidade
+
+| Navegador | Suporte                                                |
+|-----------|---------------------------------------------------------|
+| Chrome / Edge | Completo (File System Access API + reconexão automática) |
+| Firefox / Safari | Funcional, com fallback para `localStorage` (sem persistência em arquivo local) |
+
+## 📁 Estrutura do projeto
+
+```
+├── index.html       # aplicação completa (HTML + CSS + JS em um único arquivo)
+├── CHANGELOG.md      # histórico de versões
+└── README.md         # este arquivo
+```
+
+## 🔢 Versionamento
+
+O projeto segue o formato `X.Y.NNN`, onde `NNN` é a soma acumulada de mudanças individuais aplicadas desde `X.Y.000`. Veja o [CHANGELOG.md](./CHANGELOG.md) para o histórico detalhado.
+
+## 📄 Licença
+
+Uso pessoal.
