@@ -1,3 +1,44 @@
+## [1.8.044] - 2026-09-05 15:39
+
+### Renomeação: Categorias → Espaços
+
+- "Categoria(s)" renomeada para "Espaço(s)" em todas as referências visíveis: aba de Configurações, rótulos de campo, botões, mensagens de confirmação, agrupamento de tarefas, tela de mover item de espaço, etc. As chaves internas (`data-tab="categorias"`, `catById`, `getOrderedCategories` etc.) foram mantidas intactas, mesmo princípio já usado na renomeação para Taskin.
+
+### Added
+
+#### General
+
+- Novo **seletor de espaço** no topo da tela, antes do título: combo com círculo colorido + nome do espaço + seta, abrindo um menu com a lista de espaços (com marca de seleção), opção "Todos os espaços", "+ Novo espaço" (cria e leva direto para Configurações com o campo em foco) e "Gerenciar espaços" (vai para a aba Espaços). Presente nas telas de Tarefas, Notas, Calendário e Visão geral.
+- Lista de espaços removida do menu lateral — a seleção agora é feita inteiramente pelo novo seletor no topo, com o mesmo comportamento de antes (sincroniza agrupamento salvo, visão de calendário salva, limpa a busca).
+
+#### Visão geral (Dashboard)
+
+- Tela renomeada de "Dashboard" para "Visão geral" (título e item de menu).
+- Redesenho completo com cinco cards de indicadores no topo: **Tarefas** (total, concluídas/pendentes nos últimos 45 dias, barra de progresso), **Notas** (total, novas na semana, gráfico sparkline dos últimos dias), **Eventos hoje** (contagem, próximo evento, atalho para o Calendário), **Tags mais usadas** (total distintas, top 3 em pills, atalho para Configurações → Tags) e **Itens importantes** (tarefas de prioridade alta/crítica + notas fixadas).
+- Segunda linha de cards: **Tarefas por prioridade** (gráfico de rosca com total no centro e legenda com contagem/percentual), **Atividades recentes** (feed real das últimas 4 ações — tarefa concluída, nota criada, agenda criada/atualizada — com ícone, espaço de origem, módulo e horário relativo) e **Próximos eventos** (lista compacta com data/hora, título e categoria colorida).
+- Terceira seção: **Indicadores gerais** (taxa de conclusão, % em atraso, criadas vs. concluídas em 30 dias, agendas hoje, carga por espaço).
+- Quarta linha: **Notas recentes** (lista com ícone, título, pill do espaço e "Editada hoje/ontem/em DD/MM/AAAA") e **Tarefas importantes** (checkbox, título, pill de prioridade, data amigável "Hoje"/"Amanhã"/data completa, bandeira vermelha para prioridade Crítica).
+- Visão geral passou a sempre considerar **todos os espaços**, independente do espaço selecionado no seletor do topo — o restante do sistema continua respeitando o filtro normalmente.
+- Rastreamento de `updatedAt` adicionado aos eventos do calendário (não existia antes), permitindo diferenciar "agenda criada" de "agenda atualizada" no feed de atividades.
+
+### Changed
+
+#### Visão geral (Dashboard)
+
+- KPIs de conclusão (card "Tarefas" e "Taxa de conclusão") passaram a considerar apenas tarefas concluídas nos **últimos 45 dias**, não o total histórico.
+- Gráfico de rosca "Tarefas por status" substituído por "Tarefas por prioridade", reaproveitando os mesmos dados já usados em outro ponto do dashboard.
+- Peso da fonte dos números de destaque reduzido (de extra-negrito para um peso mais simples) em todo o dashboard.
+- Tamanhos de fonte gerais do dashboard reduzidos (números, títulos de seção, linhas de lista, rótulos).
+- Círculo do gráfico de prioridade aumentado (118px → 150px).
+- Layout do card "Próximos eventos" simplificado para o formato compacto (data/hora em uma linha, título, categoria colorida à direita).
+- Botão do seletor de espaço com visual menos destacado (borda neutra em vez de preenchimento verde) e levemente mais alto.
+- Card "Notas recentes" (formato lista) por notas recentes.
+
+### Removed
+
+#### Visão geral (Dashboard)
+
+- Removidos, por redundância com os novos cards de indicadores: banner de "tarefa crítica e vencida", bloco "Vencidas e Hoje / Esta Semana / Próximas agendas", bloco antigo "Tarefas abertas por prioridade / Produtividade", faixa "Últimas Notas" e seção "Outros pontos de atenção".
 ## [1.7.040] - 2026-09-02 00:05
 
 ### Renomeação do sistema

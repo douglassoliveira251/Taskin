@@ -6,13 +6,14 @@ Taskin é um sistema pessoal de produtividade — tarefas, notas, calendário e 
 
 ## ✨ Recursos
 
-- **Dashboard** — cards de alerta (vencidas, hoje, esta semana), tarefas vencidas mais antigas, indicadores de produtividade (taxa de conclusão, sequência de dias, gráfico de barras dos últimos 14 dias), distribuição de tarefas por prioridade, últimas notas e próximas agendas.
-- **Tarefas** — categorias, tags, prioridade, status, recorrência, subtarefas, comentários, ID único sequencial, filtros e agrupamento configurável (período, status, prioridade, tags, categoria).
+- **Visão geral** — cinco cards de indicadores (tarefas, notas, eventos hoje, tags mais usadas, itens importantes), gráfico de tarefas por prioridade, feed de atividades recentes, próximos eventos, indicadores gerais (taxa de conclusão, atraso, carga por espaço), notas recentes e tarefas importantes. Sempre mostra os dados de todos os espaços, independente do filtro selecionado.
+- **Tarefas** — espaços, tags, prioridade, status, recorrência, subtarefas, comentários, ID único sequencial, filtros e agrupamento configurável (período, status, prioridade, tags, espaço), associação com notas e agendas.
 - **Notas** — editor de texto rico (negrito, itálico, sublinhado, títulos, listas), anexos de imagem, cores, fixar, arquivar, tags, e associação com tarefas e agendas.
 - **Calendário** — visões de dia, semana e mês, recorrência de eventos, cor por tag, exportação de convite `.ics`, associação bidirecional com tarefas, fim de semana destacado, densidade de exibição configurável na visão semanal.
-- **Configurações** — perfil, categorias, tags, personalização (modo escuro/claro, dia de início da semana) e gerenciamento do arquivo de dados.
+- **Espaços** (antes "categorias") — organize tarefas, notas e agendas por espaço, com um seletor rápido no topo de cada tela (Tarefas, Notas, Calendário e Visão geral).
+- **Configurações** — perfil, espaços, tags, personalização (modo escuro/claro, dia de início da semana) e gerenciamento do arquivo de dados.
 - **Modo escuro** completo, com a barra lateral sempre no esquema escuro por padrão visual.
-- **Barra lateral expansível/minimizável**, com seleção rápida de categoria mesmo no modo compacto.
+- **Barra lateral expansível/minimizável**, com avatar e menu do usuário (Perfil/Configurações/Sair) no topo da tela.
 
 ## 💾 Como os dados são salvos
 
