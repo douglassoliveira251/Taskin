@@ -1,3 +1,42 @@
+## [1.9.011] - 2026-09-15 01:51
+
+### Added
+
+#### General
+
+- Novo botão **"Sobre"** no rodapé da sidebar, antes de "Modo escuro" — abre uma modal com o logo, nome, slogan, descrição curta do sistema e número da versão instalada.
+- **Novo logo/ícone da marca**: ícone de lista com check, em verde sólido (`#3FA087`, a mesma cor `--primary` já usada na sidebar), aplicado em três lugares — favicon da aba do navegador, marca da sidebar (ícone + "Taskin" quando expandida, só o ícone quando minimizada) e modal "Sobre".
+
+### Changed
+
+#### Tarefas
+
+- Dropdown da lista de Status: agora dimensiona conforme o conteúdo em vez de ficar travado exatamente na largura do campo, sem quebrar texto em várias linhas. Só a lista mudou — o campo (trigger) continua do mesmo tamanho.
+- Campo Agenda vinculada: data/hora agora em uma linha (fonte normal, menor e um pouco mais escura) e o título da tarefa embaixo, truncado a uma linha.
+
+#### Calendário
+
+- Ao criar uma agenda a partir de uma tarefa, a descrição da tarefa é copiada automaticamente para a descrição do evento.
+
+#### Notas
+
+- Botão de filtro de tags movido do corpo da tela para o topo, logo depois do campo de busca — some automaticamente ao sair da tela de Notas.
+
+#### Geral
+
+- Modal "Sobre": removido o botão "Fechar", mantendo apenas um X no canto superior direito.
+
+### Removed
+
+#### Visão geral
+
+- Seletor de espaço removido do título da tela de Visão geral (ela sempre mostra todos os espaços, então o seletor ali não tinha função).
+
+### Fixed
+
+#### Geral
+
+- Corrigido o favicon do site, que não estava refletindo o novo logo: havia um segundo favicon antigo (PNG, resquício de antes da renomeação para Taskin) ainda declarado no HTML, competindo com o novo SVG. Removida a referência antiga — agora só existe um favicon declarado, com o ícone e a cor atuais do sistema.
 ## [1.8.044] - 2026-09-05 15:39
 
 ### Renomeação: Categorias → Espaços
