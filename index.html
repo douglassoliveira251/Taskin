@@ -959,12 +959,6 @@
     border:1px solid var(--border); border-radius:6px; padding:5px 8px; font-size:12.5px; color:var(--ink-soft);
   }
 
-  .notes-grid{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
-    grid-auto-rows:4px; gap:16px; max-width:1100px; margin:0 auto; align-items:start;
-  }
-  .app.sidebar-collapsed .notes-grid{max-width:1280px;}
-
   .notes-layout{display:flex; gap:16px; align-items:flex-start; height:calc(100vh - 118px);}
   #notesView{padding:16px 20px 16px !important;}
   .notebooks-col{
@@ -974,6 +968,12 @@
   }
   .notebooks-col-header-row{display:flex; align-items:center; justify-content:space-between; padding:2px 4px 10px;}
   .notebooks-col-header{font-size:11px; font-weight:700; color:var(--ink-faint); letter-spacing:.04em;}
+  .notebooks-space-header{
+    display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--ink-soft);
+    padding:10px 6px 4px; text-transform:uppercase; letter-spacing:.03em;
+  }
+  .notebooks-space-header:first-child{padding-top:2px;}
+  .notebooks-space-header .cat-swatch{width:7px; height:7px;}
   .notebook-new-btn-top{
     width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center;
     color:var(--primary); background:var(--primary-light); flex-shrink:0;
@@ -1057,42 +1057,6 @@
   }
   .note-actions-inline{display:flex; align-items:center; gap:6px; flex:1; min-width:0; flex-wrap:wrap;}
   .note-tags-row{margin-bottom:14px;}
-  .note-card{
-    border-radius:var(--radius); border:1px solid var(--border);
-    padding:14px 15px; position:relative;
-    box-shadow:var(--shadow-sm);
-  }
-  .note-card.selected{ border-color:var(--primary); box-shadow:var(--shadow-md); }
-  .note-clip-wrap, .note-meta, .note-footer-row{ cursor:pointer; }
-  .note-clip-wrap{ max-height:170px; overflow:hidden; position:relative; }
-  .note-card::after{
-    content:''; position:absolute; left:0; right:0; bottom:0; height:60px;
-    background:linear-gradient(to bottom, transparent, var(--note-bg, var(--surface)));
-    border-radius:0 0 var(--radius) var(--radius); pointer-events:none;
-  }
-  .note-body-preview{font-size:13px; line-height:1.5; color:var(--ink-soft); word-break:break-word;}
-  .note-cat-chip-mini{
-    font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; white-space:nowrap;
-  }
-  .note-meta-left{display:flex; align-items:center; gap:6px; min-width:0; overflow:hidden;}
-  .note-tag-pill-mini{
-    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600;
-    padding:2px 8px; border-radius:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .note-tag-pill-mini .dot{width:5px; height:5px; border-radius:50%; flex-shrink:0;}
-  .note-tag-more-mini{
-    font-size:10.5px; color:var(--ink-faint); font-weight:600; flex-shrink:0;
-  }
-  .note-attach-row-preview{display:flex; gap:5px; margin-top:8px;}
-  .note-attach-row-preview img{width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--border);}
-  .note-attach-more{
-    display:flex; align-items:center; justify-content:center; width:40px; height:40px;
-    border-radius:6px; background:var(--surface-2); color:var(--ink-faint); font-size:11px; font-weight:600;
-  }
-  .notes-layout{ display:flex; gap:20px; align-items:flex-start; }
-  .notes-list-col{ flex:1; min-width:0; }
-  .notes-list-col.with-panel{ max-width:calc(100% - var(--edit-panel-width, 500px) - 28px); }
-  .note-edit-panel .note-body-input{ min-height:200px; }
   .tp-header-actions{display:flex; align-items:center; gap:2px;}
   .tp-header-icon-btn{
     width:28px; height:28px; border:none; background:transparent; color:var(--ink-faint);
@@ -1108,9 +1072,7 @@
     align-items:center; gap:1px; flex-wrap:wrap;
     padding-top:8px; margin-top:8px; border-top:1px solid var(--border);
   }
-  .composer:focus-within .rt-toolbar,
-  .note-card:focus-within .rt-toolbar,
-  .note-edit-panel .rt-toolbar{
+  .composer:focus-within .rt-toolbar{
     display:flex;
   }
   .composer .rt-toolbar{
@@ -1135,43 +1097,19 @@
   .rt-format-select:hover{color:var(--ink);}
   .rt-format-select:focus{outline:none;}
 
-  .note-body-input h1, .note-body h1, .note-body-preview h1{font-family:var(--font-display); font-size:20px; font-weight:700; margin:6px 0;}
-  .note-body-input h2, .note-body h2, .note-body-preview h2{font-family:var(--font-display); font-size:17px; font-weight:700; margin:5px 0;}
-  .note-body-input h3, .note-body h3, .note-body-preview h3{font-family:var(--font-display); font-size:14.5px; font-weight:700; margin:4px 0;}
+  .note-body-input h1{font-family:var(--font-display); font-size:20px; font-weight:700; margin:6px 0;}
+  .note-body-input h2{font-family:var(--font-display); font-size:17px; font-weight:700; margin:5px 0;}
+  .note-body-input h3{font-family:var(--font-display); font-size:14.5px; font-weight:700; margin:4px 0;}
 
-  .note-body-input, .note-body{
+  .note-body-input{
     font-size:13.5px; line-height:1.55; outline:none; color:var(--ink-soft);
     min-height:20px; word-break:break-word;
   }
-  .note-body-input:empty:before, .note-body:empty:before{
+  .note-body-input:empty:before{
     content:attr(data-placeholder); color:var(--ink-faint);
   }
-  .note-body-input ul, .note-body ul, .note-body-preview ul{ padding-left:20px; list-style:disc; }
-  .note-body-input ol, .note-body ol, .note-body-preview ol{ padding-left:20px; list-style:decimal; }
-  .note-meta{
-    display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px;
-    font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono);
-  }
-  .note-cat-chip{
-    display:inline-flex; align-items:center; gap:4px;
-    padding:2px 7px; border-radius:20px; background:rgba(0,0,0,.05);
-  }
-  .note-cat-picker{
-    border:none; background:transparent; font-size:12px; font-weight:700;
-    font-family:var(--font-display); padding:2px 2px 2px 0;
-  }
-  .note-cat-picker:hover{opacity:.8; cursor:pointer;}
-  .note-cat-picker:focus{outline:none;}
-  .note-footer-row{
-    display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:8px;
-  }
-  .color-swatch-btn{
-    width:16px; height:16px; border-radius:50%; border:1.5px solid var(--border);
-    cursor:pointer; flex-shrink:0; padding:0;
-  }
-  .color-swatch-label{
-    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft); cursor:pointer;
-  }
+  .note-body-input ul{ padding-left:20px; list-style:disc; }
+  .note-body-input ol{ padding-left:20px; list-style:decimal; }
   .confirm-action-portal{
     display:none; position:fixed; z-index:800; width:220px;
     background:var(--surface); border:1px solid var(--border); border-radius:10px;
@@ -1196,7 +1134,6 @@
   }
   .note-color-dot.selected{border-color:var(--ink);}
   .color-popover-portal .note-color-dot{ width:22px; height:22px; border-width:2px; }
-  .note-updated-at{font-size:10px; color:var(--ink-faint); font-family:var(--font-mono); white-space:nowrap;}
   .note-attach-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
   .note-attach-thumb{
     position:relative; width:56px; height:56px; border-radius:6px; overflow:hidden;
@@ -1235,28 +1172,6 @@
   .group-move-row{display:flex; align-items:center; gap:8px; flex-shrink:0;}
   .cat-tags-combined-row{display:flex; align-items:center; gap:10px;}
   .cat-tags-combined-row .tp-tags-selected{flex:1; min-width:0;}
-  .note-actions{
-    position:absolute; top:10px; right:10px; z-index:10;
-    display:flex; gap:4px;
-  }
-  .note-actions button{
-    width:24px; height:24px; border-radius:6px; border:none; background:transparent;
-    display:flex; align-items:center; justify-content:center; color:var(--ink-soft);
-    opacity:0; transition:opacity .15s, background .15s;
-  }
-  .note-actions button.pinned{color:var(--danger);}
-  .note-card:hover .note-actions button{opacity:1; background:var(--note-bg);}
-  .note-actions button:hover{filter:brightness(0.94); color:var(--ink);}
-  .note-actions button svg{width:13px; height:13px;}
-  .note-corner-pin{
-    position:absolute; top:0; right:0; z-index:9;
-    width:22px; height:22px; display:flex; align-items:center; justify-content:center;
-    color:var(--danger); border-radius:0 var(--radius) 0 8px;
-    transition:opacity .15s;
-  }
-  .note-corner-pin svg{width:12px; height:12px;}
-  .note-card:hover .note-corner-pin{opacity:0; pointer-events:none;}
-
   /* ===== Dashboard ===== */
   .dash-wrap{display:flex; flex-direction:column; gap:20px; max-width:1180px; margin:0 auto; padding-bottom:30px;}
 
@@ -3659,7 +3574,7 @@ function renderTaskPanel(panel){
     }
     box.innerHTML = linked.map(n => `
       <div class="tp-task-agenda-row" data-note-id="${n.id}">
-        <span class="dot" style="background:${n.color||'var(--ink-faint)'}"></span>
+        <span class="dot" style="background:var(--ink-faint)"></span>
         <span class="tp-task-agenda-date">${fmtUpdatedAt(n.updatedAt)}</span>
         <span class="tp-task-agenda-title">${escapeHtml(n.title||'Sem título')}</span>
       </div>
@@ -4464,7 +4379,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.9.006';
+const APP_VERSION = '1.10.020';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -4850,7 +4765,7 @@ function renderDashboard(){
             ${recentNotes.map(n => {
               const cat = catById(n.categoryId);
               return `<div class="dash-notelist-row" data-note-id="${n.id}">
-                <span class="dash-notelist-icon" style="background:${n.color||'#999'}22; color:${n.color||'#999'};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></span>
+                <span class="dash-notelist-icon" style="background:var(--surface-2); color:var(--ink-faint);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></span>
                 <span class="dash-notelist-title">${escapeHtml(n.title||'Sem título')}</span>
                 ${cat ? `<span class="dash-notelist-cat" style="background:${cat.color}22; color:${cat.color};">${escapeHtml(cat.name)}</span>` : ''}
                 <span class="dash-notelist-time">Editada ${fmtEditedLabel(n.updatedAt||n.createdAt)}</span>
@@ -5634,12 +5549,11 @@ function renderNotes(){
 
   const notebooksCol = document.createElement('div');
   notebooksCol.className = 'notebooks-col';
-  let nbHtml = '';
-  spaceNotebooks.forEach(nb => {
+  function notebookGroupHtml(nb){
     const nbNotes = state.notes.filter(n => n.notebookId === nb.id && !n.archived && matches(n))
       .sort((a,b) => (b.pinned - a.pinned) || ((b.pinnedAt||0) - (a.pinnedAt||0)) || (b.updatedAt - a.updatedAt));
     const expanded = expandedNotebookIds.has(nb.id);
-    nbHtml += `
+    return `
       <div class="notebook-group">
         <div class="notebook-row" data-nb-id="${nb.id}">
           <svg class="notebook-chevron ${expanded?'expanded':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -5655,7 +5569,19 @@ function renderNotes(){
         </div>` : ''}
       </div>
     `;
-  });
+  }
+  let nbHtml = '';
+  if(activeCategoryFilter){
+    spaceNotebooks.forEach(nb => { nbHtml += notebookGroupHtml(nb); });
+  } else {
+    // sem filtro de espaço: agrupar os cadernos por espaço, mantendo a estrutura de cada um separada
+    state.categories.forEach(cat => {
+      const catNotebooks = spaceNotebooks.filter(nb => nb.categoryId === cat.id);
+      if(catNotebooks.length === 0) return;
+      nbHtml += `<div class="notebooks-space-header"><span class="cat-swatch" style="background:${cat.color}"></span>${escapeHtml(cat.name)}</div>`;
+      catNotebooks.forEach(nb => { nbHtml += notebookGroupHtml(nb); });
+    });
+  }
   const archivedInScope = state.notes.filter(n => n.archived && matches(n) && (!activeCategoryFilter || n.categoryId === activeCategoryFilter));
   const archivedExpanded = expandedNotebookIds.has('_archived');
   nbHtml += `
@@ -5797,80 +5723,6 @@ function renderNotes(){
     markDirty();
     renderNotes();
   };
-}
-
-function applyNotesMasonry(grid){
-  if(!grid || !grid.isConnected) return;
-  const styles = window.getComputedStyle(grid);
-  const rowHeight = parseFloat(styles.getPropertyValue('grid-auto-rows')) || 4;
-  const rowGapRaw = styles.getPropertyValue('row-gap') || styles.getPropertyValue('gap') || '16px';
-  const rowGap = parseFloat(rowGapRaw) || 16;
-  grid.querySelectorAll('.note-card').forEach(card => {
-    const height = card.getBoundingClientRect().height;
-    if(!height) return;
-    const span = Math.ceil((height + rowGap) / (rowHeight + rowGap));
-    card.style.gridRowEnd = 'span ' + Math.max(1, span);
-  });
-}
-
-function renderNoteCard(n){
-  const card = document.createElement('div');
-  card.className = 'note-card';
-  card.style.background = n.color + '22';
-  card.style.borderColor = n.color + '55';
-  card.style.setProperty('--note-bg', n.color + '22');
-  const cat = catById(n.categoryId);
-  const attachments = n.attachments || [];
-  const noteTags = (n.tagIds||[]).map(id => state.tags.find(tg=>tg.id===id)).filter(Boolean);
-  card.innerHTML = `
-    ${n.pinned ? `<div class="note-corner-pin">${pinIconSvg(true)}</div>` : ''}
-    <div class="note-actions">
-      <button class="np-pin ${n.pinned?'pinned':''}" title="${n.pinned?'Desafixar':'Fixar'}">${pinIconSvg(n.pinned)}</button>
-      <button class="move-group-btn note-action-icon" id="cardMoveGroupBtn-${n.id}" title="Mover de grupo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M12 11v4M10 13h4"/></svg></button>
-      <button class="np-del" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z"/></svg></button>
-    </div>
-    <div class="note-clip-wrap">
-      <div class="note-title">${escapeHtml(n.title || 'Sem título')}</div>
-      <div class="note-body-preview">${n.body || ''}</div>
-      ${attachments.length ? `<div class="note-attach-row-preview">${attachments.slice(0,3).map(a=>`<img src="${a.dataUrl}" alt="">`).join('')}${attachments.length>3?`<span class="note-attach-more">+${attachments.length-3}</span>`:''}</div>` : ''}
-    </div>
-    <div class="note-meta">
-      <div class="note-meta-left">
-        <span class="note-cat-chip-mini" style="background:${cat?cat.color:'#999'}22; color:${cat?cat.color:'var(--ink-soft)'};">${escapeHtml(cat?cat.name:'Sem espaço')}</span>
-        ${noteTags.length ? `<span class="note-tag-pill-mini" style="background:${noteTags[0].color}22; color:${noteTags[0].color};"><span class="dot" style="background:${noteTags[0].color}"></span>${escapeHtml(noteTags[0].name)}</span>` : ''}
-        ${noteTags.length > 1 ? `<span class="note-tag-more-mini" title="${noteTags.slice(1).map(t=>t.name).join(', ')}">+${noteTags.length-1}</span>` : ''}
-      </div>
-      <span class="note-updated-at">Editado em ${fmtUpdatedAt(n.updatedAt)}</span>
-    </div>
-  `;
-  card.querySelector('.np-pin').onclick = (e) => {
-    e.stopPropagation();
-    n.pinned = !n.pinned;
-    n.pinnedAt = n.pinned ? Date.now() : null;
-    markDirty();
-  };
-  card.querySelector(`#cardMoveGroupBtn-${n.id}`).onclick = (e) => {
-    e.stopPropagation();
-    openMoveGroupPortal(e.currentTarget, n.categoryId, (newCatId) => {
-      n.categoryId = newCatId;
-      n.tagIds = (n.tagIds||[]).filter(id => {
-        const tg = state.tags.find(x => x.id === id);
-        return tg && (!tg.categoryId || tg.categoryId === newCatId);
-      });
-      markDirty();
-    });
-  };
-  card.querySelector('.np-del').onclick = (e) => {
-    e.stopPropagation();
-    openConfirmPortal(e.currentTarget, 'Excluir esta nota?', () => {
-      state.notes = state.notes.filter(x => x.id !== n.id);
-      markDirty();
-    });
-  };
-  const openThisNote = () => openNoteComposer(n);
-  card.querySelector('.note-clip-wrap').addEventListener('click', openThisNote);
-  card.querySelector('.note-meta').addEventListener('click', openThisNote);
-  return card;
 }
 
 function initials(name){
@@ -6527,6 +6379,8 @@ document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
     btn.classList.add('active');
     activeTaskId = null;
     creatingNewTask = false;
+    creatingNewNote = false;
+    pendingNoteNotebookId = null;
     clearSearchTerm();
     render();
   };
@@ -6542,6 +6396,8 @@ function openSettingsView(tab){
   document.querySelectorAll('.nav-item[data-view]').forEach(b=>b.classList.remove('active'));
   activeTaskId = null;
   creatingNewTask = false;
+  creatingNewNote = false;
+  pendingNoteNotebookId = null;
   clearSearchTerm();
   render();
 }
