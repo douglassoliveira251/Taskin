@@ -778,7 +778,7 @@
   .tp-status-icon{width:15px; height:15px; display:flex; flex-shrink:0;}
   .tp-status-icon svg{width:100%; height:100%;}
   .tp-status-icon.status-nao_iniciado{color:var(--ink-faint);}
-  .tp-status-icon.status-em_andamento{color:#4B5563;}
+  .tp-status-icon.status-em_andamento{color:var(--ink-soft);}
   .tp-status-icon.status-concluida{color:var(--primary);}
   .tp-status-dropdown{
     position:absolute; top:calc(100% + 4px); left:0; z-index:20;
@@ -801,8 +801,8 @@
   }
   .tp-tag-chip[data-tag-id]{cursor:pointer; transition:filter .1s;}
   .tp-tag-chip[data-tag-id]:hover{filter:brightness(0.88);}
-  [data-theme="dark"] .tp-tag-chip{filter:brightness(0.78) saturate(0.82);}
-  [data-theme="dark"] .tp-tag-chip[data-tag-id]:hover{filter:brightness(0.7) saturate(0.82);}
+  [data-theme="dark"] .tp-tag-chip{filter:brightness(0.62) saturate(0.6);}
+  [data-theme="dark"] .tp-tag-chip[data-tag-id]:hover{filter:brightness(0.54) saturate(0.6);}
   .tp-tags-add-btn{
     border:1px dashed var(--border); background:transparent; color:var(--ink-faint);
     font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;
