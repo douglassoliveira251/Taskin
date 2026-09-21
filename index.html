@@ -938,31 +938,38 @@
   .notebooks-space-header:first-child{padding-top:0;}
   .notebooks-space-header .cat-swatch{width:7px; height:7px;}
   .notebook-new-btn-top{
-    width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center;
-    color:var(--ink-faint); background:transparent; flex-shrink:0;
+    width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-faint); background:transparent; border:none; flex-shrink:0;
   }
   .notebook-new-btn-top:hover{background:var(--surface-2); color:var(--primary);}
   .notebook-new-btn-top svg{width:14px; height:14px;}
-  .notebooks-list{display:flex; flex-direction:column; gap:1px; flex:1;}
-  .notebook-group{margin-bottom:1px;}
+  .notebooks-list{display:flex; flex-direction:column; gap:3px; flex:1;}
+  .notebook-group{margin-bottom:2px;}
   .notebook-row{
-    display:flex; align-items:center; gap:7px; padding:8px 6px; border-radius:7px; cursor:pointer; min-width:0;
+    display:flex; align-items:center; gap:8px; padding:9px 8px 9px 9px; border-radius:8px; cursor:pointer; min-width:0;
+    border-left:3px solid var(--nb-color, var(--border));
   }
   .notebook-row:hover{background:var(--surface-2);}
   .notebook-chevron{width:12px; height:12px; flex-shrink:0; color:var(--ink-faint); transition:transform .12s;}
   .notebook-chevron.expanded{transform:rotate(90deg);}
-  .notebook-icon{width:15px; height:15px; flex-shrink:0; color:var(--ink-soft);}
-  .notebook-name{flex:1; min-width:0; font-size:13px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .notebook-icon{width:16px; height:16px; flex-shrink:0; color:var(--nb-color, var(--ink-soft));}
+  .notebook-name{
+    flex:1; min-width:0; font-family:var(--font-display); font-size:13.5px; font-weight:700; color:var(--ink);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
   .notebook-count{
     font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); flex-shrink:0;
     background:var(--surface-2); padding:1px 6px; border-radius:20px;
   }
-  .notebook-menu-btn{width:20px; height:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:5px; color:var(--ink-faint);}
+  .notebook-menu-btn{
+    width:24px; height:24px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    border-radius:6px; color:var(--ink-faint); background:transparent; border:none;
+  }
   .notebook-menu-btn:hover{background:var(--surface); color:var(--ink);}
   .notebook-menu-btn svg{width:13px; height:13px;}
-  .notebook-notes{display:flex; flex-direction:column; gap:1px; padding-left:20px; margin:1px 0 3px; border-left:1px solid var(--border); margin-left:14px;}
+  .notebook-notes{display:flex; flex-direction:column; gap:1px; padding-left:20px; margin:2px 0 4px; border-left:1px solid var(--border); margin-left:19px;}
   .notebook-note-item{
-    display:flex; align-items:center; gap:6px; padding:6px 8px; border-radius:6px; font-size:12.5px;
+    display:flex; align-items:center; gap:6px; padding:7px 8px; border-radius:6px; font-size:12.5px;
     color:var(--ink-soft); cursor:pointer; overflow:hidden;
   }
   .notebook-note-item span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -971,7 +978,8 @@
   .nb-note-pin{color:var(--accent); flex-shrink:0;}
   .notebook-note-item.is-pinned{color:var(--ink);}
   .notebook-add-note-btn{
-    font-size:12px; color:var(--ink-faint); padding:6px 8px; border-radius:6px; text-align:left;
+    font-size:12px; color:var(--ink-faint); padding:7px 8px; border-radius:6px; text-align:left;
+    background:transparent; border:none; width:100%;
   }
   .notebook-add-note-btn:hover{background:var(--surface-2); color:var(--primary);}
   .notebook-empty-hint{font-size:11.5px; color:var(--ink-faint); padding:5px 8px;}
@@ -997,7 +1005,10 @@
   .note-detail-empty svg{width:48px; height:48px; opacity:.5;}
   .note-detail-empty p{font-size:13.5px; max-width:260px;}
   .note-composer-inline{display:flex; flex-direction:column; max-width:760px; margin:0 auto; width:100%;}
+  .note-detail-header{display:flex; align-items:flex-start; gap:10px;}
+  .note-header-actions{display:flex; align-items:center; gap:2px; flex-shrink:0; margin-top:4px;}
   .note-composer-inline .note-title{
+    flex:1; min-width:0;
     font-family:var(--font-display); font-size:24px; font-weight:700; width:100%;
     border:none; border-bottom:2px solid var(--border);
     margin:2px 0 16px; padding:0 0 10px; background:transparent; color:var(--ink);
@@ -1006,13 +1017,16 @@
   .note-composer-inline .note-body-input{min-height:320px; flex:1;}
   .note-toolbar-row{
     display:flex; align-items:center; flex-wrap:wrap; gap:6px;
-    border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;
+    border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px;
+  }
+  .note-meta-row{
+    display:flex; align-items:center; flex-wrap:wrap; gap:10px;
+    margin-bottom:16px;
   }
   .note-toolbar-row .rt-toolbar{
     display:flex !important; border-top:none; border-bottom:none; margin:0; padding:0; position:static;
     background:transparent;
   }
-  .note-actions-inline{display:flex; align-items:center; gap:6px; flex:1; min-width:0; flex-wrap:wrap;}
   .note-tags-row{margin-bottom:16px;}
   .tp-header-actions{display:flex; align-items:center; gap:2px;}
   .tp-header-icon-btn{
@@ -1121,7 +1135,6 @@
   }
   .move-group-btn:hover{background:var(--surface-2); color:var(--ink);}
   .move-group-btn svg{width:15px; height:15px;}
-  .move-group-btn.pinned-active{color:var(--danger); border-color:var(--danger);}
   .group-current-chip{
     display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:20px;
     font-size:12.5px; font-weight:600; flex-shrink:0; white-space:nowrap;
@@ -4075,21 +4088,25 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
   let noteNotebookId = isEditing ? existingNote.notebookId : forcedNotebookId;
 
   composer.innerHTML = `
-    <input type="text" class="note-title" placeholder="${isEditing?'':'Título da nota'}" value="${isEditing ? escapeHtml(existingNote.title||'') : (prefillTask ? escapeHtml(prefillTask.title||'') : '')}">
+    <div class="note-detail-header">
+      <input type="text" class="note-title" placeholder="${isEditing?'':'Título da nota'}" value="${isEditing ? escapeHtml(existingNote.title||'') : (prefillTask ? escapeHtml(prefillTask.title||'') : '')}">
+      <div class="note-header-actions">
+        ${isEditing ? `<button type="button" class="tp-header-icon-btn ${existingNote.pinned?'active':''}" id="composerPinBtn" title="${existingNote.pinned?'Desafixar':'Fixar'}">${pinIconSvg(existingNote.pinned)}</button>` : ''}
+        ${isEditing ? `<button type="button" class="tp-header-icon-btn danger" id="composerDeleteBtn" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z"/></svg></button>` : ''}
+      </div>
+    </div>
     <div class="note-toolbar-row" id="noteToolbarRow">
       <div class="rt-toolbar-slot"></div>
-      <div class="note-actions-inline">
-        <button type="button" class="move-group-btn" id="noteMoveGroupBtn" title="Mover de grupo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M12 11v4M10 13h4"/></svg></button>
-        <span class="group-current-chip" id="noteGroupChip"></span>
-        <button type="button" class="note-attach-btn" id="composerAttachBtn" title="Anexar imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.19 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
-        <input type="file" id="composerAttachInput" accept="image/*" multiple style="display:none;">
-        <button type="button" class="note-linked-task-btn" id="noteLinkedTaskBtn" title="Vincular tarefa">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-          <span id="noteLinkedTaskLabel">Vincular tarefa</span>
-        </button>
-        ${isEditing ? `<button type="button" class="move-group-btn ${existingNote.pinned?'pinned-active':''}" id="composerPinBtn" title="${existingNote.pinned?'Desafixar':'Fixar'}">${pinIconSvg(existingNote.pinned)}</button>` : ''}
-        ${isEditing ? `<button type="button" class="btn ghost small" id="composerDeleteBtn" style="color:var(--danger); border-color:var(--danger-light); margin-left:auto;">Excluir</button>` : ''}
-      </div>
+    </div>
+    <div class="note-meta-row">
+      <button type="button" class="move-group-btn" id="noteMoveGroupBtn" title="Mover de grupo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M12 11v4M10 13h4"/></svg></button>
+      <span class="group-current-chip" id="noteGroupChip"></span>
+      <button type="button" class="note-attach-btn" id="composerAttachBtn" title="Anexar imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.19 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+      <input type="file" id="composerAttachInput" accept="image/*" multiple style="display:none;">
+      <button type="button" class="note-linked-task-btn" id="noteLinkedTaskBtn" title="Vincular tarefa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span id="noteLinkedTaskLabel">Vincular tarefa</span>
+      </button>
     </div>
     <div class="note-tags-row">
       <div class="tp-tags-selected" id="noteTagsSelected">
@@ -4236,7 +4253,7 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
       e.stopPropagation();
       existingNote.pinned = !existingNote.pinned;
       existingNote.pinnedAt = existingNote.pinned ? Date.now() : null;
-      pinBtn.classList.toggle('pinned-active', existingNote.pinned);
+      pinBtn.classList.toggle('active', existingNote.pinned);
       pinBtn.title = existingNote.pinned ? 'Desafixar' : 'Fixar';
       pinBtn.innerHTML = pinIconSvg(existingNote.pinned);
       markDirty();
@@ -5504,9 +5521,10 @@ function renderNotes(){
     const nbNotes = state.notes.filter(n => n.notebookId === nb.id && !n.archived && matches(n))
       .sort((a,b) => (b.pinned - a.pinned) || ((b.pinnedAt||0) - (a.pinnedAt||0)) || (b.updatedAt - a.updatedAt));
     const expanded = expandedNotebookIds.has(nb.id);
+    const nbCat = catById(nb.categoryId);
     return `
       <div class="notebook-group">
-        <div class="notebook-row" data-nb-id="${nb.id}">
+        <div class="notebook-row" data-nb-id="${nb.id}" style="--nb-color:${nbCat?nbCat.color:'var(--border)'};">
           <svg class="notebook-chevron ${expanded?'expanded':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           <svg class="notebook-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
           <span class="notebook-name">${escapeHtml(nb.name && nb.name.trim() ? nb.name : 'Caderno sem nome')}</span>
