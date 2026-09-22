@@ -985,10 +985,20 @@
     display:flex; align-items:center; gap:6px; padding:7px 8px; border-radius:6px; font-size:12.5px;
     color:var(--ink-soft); cursor:pointer; overflow:hidden;
   }
-  .notebook-note-item span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .notebook-note-item span{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .notebook-note-item:hover{background:var(--surface-2);}
   .notebook-note-item.active{background:var(--primary-light); color:var(--primary-dark); font-weight:600;}
-  .nb-note-pin{color:var(--primary-dark); flex-shrink:0;}
+  .nb-note-item-actions{display:flex; align-items:center; gap:2px; flex-shrink:0;}
+  .nb-note-pin-btn, .nb-note-move-btn{
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:18px; height:18px; padding:0; border:none; background:transparent;
+    color:var(--ink-faint); border-radius:4px; opacity:0;
+  }
+  .notebook-note-item:hover .nb-note-pin-btn, .notebook-note-item:hover .nb-note-move-btn{opacity:1;}
+  .nb-note-pin-btn:hover, .nb-note-move-btn:hover{background:var(--surface); color:var(--ink);}
+  .nb-note-pin-btn.pinned{opacity:1; color:var(--primary-dark);}
+  .nb-note-pin-btn.pinned:hover{color:var(--ink-faint);}
+  .nb-note-pin-btn svg, .nb-note-move-btn svg{width:11px; height:11px;}
   .notebook-note-item.is-pinned{color:var(--ink);}
   .notebook-add-note-btn{
     font-size:12px; color:var(--ink-soft); padding:7px 8px; border-radius:6px; text-align:left;
@@ -3063,6 +3073,42 @@ function openMoveGroupPortal(anchorBtn, currentCatId, onSelect){
 }
 document.addEventListener('click', closeMoveGroupPortal);
 window.addEventListener('scroll', closeMoveGroupPortal, true);
+
+function openNoteNotebookMovePortal(anchorBtn, note){
+  const portal = ensureMoveGroupPortal();
+  const wasOpen = portal.classList.contains('show') && portal.dataset.forBtn === anchorBtn.dataset.moveGroupId;
+  closeMoveGroupPortal();
+  if(wasOpen) return;
+  if(!anchorBtn.dataset.moveGroupId) anchorBtn.dataset.moveGroupId = uid('mvnb');
+  portal.dataset.forBtn = anchorBtn.dataset.moveGroupId;
+  const spaceNbs = state.notebooks
+    .filter(nb => nb.categoryId === note.categoryId)
+    .sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  portal.innerHTML = `
+    <div class="tp-tags-popover-list">
+      ${spaceNbs.length ? spaceNbs.map(nb => `
+        <div class="tp-tags-popover-row" data-nb="${nb.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--ink-faint); flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span class="tp-tags-popover-name">${escapeHtml(nb.name && nb.name.trim() ? nb.name : 'Caderno sem nome')}</span>
+          ${nb.id===note.notebookId ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg>` : ''}
+        </div>
+      `).join('') : `<div style="font-size:12px;color:var(--ink-faint); padding:4px 2px;">Nenhum outro caderno neste espaço</div>`}
+    </div>
+  `;
+  portal.classList.add('show');
+  positionTagsPortalNear(portal, anchorBtn);
+  portal.onclick = e => e.stopPropagation();
+  portal.querySelectorAll('.tp-tags-popover-row').forEach(row => {
+    row.onclick = () => {
+      note.notebookId = row.dataset.nb;
+      expandedNotebookIds.add(row.dataset.nb);
+      closeMoveGroupPortal();
+      if(currentNoteComposerCommit) currentNoteComposerCommit();
+      markDirty();
+      renderNotes();
+    };
+  });
+}
 
 function ensureTagsPortal(){
   let portal = document.getElementById('tagsPickerPortal');
@@ -5569,7 +5615,13 @@ function renderNotes(){
         </div>
         ${expanded ? `
         <div class="notebook-notes">
-          ${nbNotes.map(n => `<div class="notebook-note-item ${n.id===activeNoteId?'active':''} ${n.pinned?'is-pinned':''}" data-note-id="${n.id}">${n.pinned?'<svg class="nb-note-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 17v5M9 10.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V16a1 1 0 001 1h12a1 1 0 001-1v-.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V7a1 1 0 011-1 2 2 0 000-4H8a2 2 0 000 4 1 1 0 011 1z"/></svg>':''}<span>${escapeHtml(n.title||'Sem título')}</span></div>`).join('')}
+          ${nbNotes.map(n => `<div class="notebook-note-item ${n.id===activeNoteId?'active':''} ${n.pinned?'is-pinned':''}" data-note-id="${n.id}">
+            <span>${escapeHtml(n.title||'Sem título')}</span>
+            <div class="nb-note-item-actions">
+              <button type="button" class="nb-note-move-btn" data-move-note-id="${n.id}" title="Mover para caderno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg></button>
+              <button type="button" class="nb-note-pin-btn ${n.pinned?'pinned':''}" data-pin-note-id="${n.id}" title="${n.pinned?'Desafixar':'Fixar'}">${pinIconSvg(n.pinned)}</button>
+            </div>
+          </div>`).join('')}
           <button type="button" class="notebook-add-note-btn" data-nb-id="${nb.id}">+ Nova nota</button>
         </div>` : ''}
       </div>
@@ -5682,6 +5734,26 @@ function renderNotes(){
   });
   notebooksCol.querySelectorAll('.notebook-note-item[data-note-id]').forEach(item => {
     item.addEventListener('click', () => selectNote(item.dataset.noteId));
+  });
+  notebooksCol.querySelectorAll('.nb-note-pin-btn[data-pin-note-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const n = state.notes.find(x => x.id === btn.dataset.pinNoteId);
+      if(!n) return;
+      n.pinned = !n.pinned;
+      n.pinnedAt = n.pinned ? Date.now() : null;
+      if(currentNoteComposerCommit) currentNoteComposerCommit();
+      markDirty();
+      renderNotes();
+    });
+  });
+  notebooksCol.querySelectorAll('.nb-note-move-btn[data-move-note-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const n = state.notes.find(x => x.id === btn.dataset.moveNoteId);
+      if(!n) return;
+      openNoteNotebookMovePortal(btn, n);
+    });
   });
   notebooksCol.querySelectorAll('.notebook-add-note-btn[data-nb-id]').forEach(btn => {
     btn.addEventListener('click', (e) => {
