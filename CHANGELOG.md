@@ -1,3 +1,40 @@
+## [1.10.040] - 2026-09-22 00:00
+
+### Changed
+
+#### Notas
+
+- Layout completo da tela redesenhado no padrão visual de Tarefas: Cadernos numa coluna própria (com busca, redimensionável arrastando a borda), nota aberta ao lado numa única superfície contínua em vez de duas caixas separadas.
+- Removida a cor por nota (seletor de cor, fundo colorido no card) — paleta neutra em todo o fluxo, como no resto do sistema.
+- Cadernos: contagem de notas como badge, criar/renomear/excluir/**mover de espaço** pelo menu (⋮), nome com fonte de título.
+- Notas: mover para outro caderno arrastando a nota até ele, ou clicando no caderno mostrado no breadcrumb "Espaço › Caderno" dentro da nota (substituiu o botão de mover na barra de ferramentas).
+- Pin: continua na lista de cadernos como antes, agora clicável para desafixar direto ali; fixar/excluir na nota aberta viraram botões circulares no cabeçalho, no mesmo padrão do sino de notificações.
+- Tags removidas das notas (composer e filtro no topo da tela) — seguem existindo normalmente em Tarefas.
+- "Cadernos" e a lista de cadernos/notas puxados um pouco mais à esquerda; barra de formatação e linha de mover/anexar/vincular tarefa voltaram a ficar numa única linha, com divisor sutil entre os grupos.
+
+#### Tarefas
+
+- Modo escuro: ícone de status "Em andamento" e cor das tags reequilibrados para contraste adequado sobre fundo escuro.
+
+#### Geral
+
+- Botão "Sair": corrigida a confirmação de desconexão, que fechava sozinha no mesmo clique em que abria e aparecia fora do lugar na tela.
+
+### Removed
+
+#### Notas
+
+- Modal de nota legado (não usado desde a migração para o layout de Cadernos) e o código morto acumulado da grade antiga de notas coloridas — parte dele colidia com o CSS do editor novo e quebrava o sublinhado do título e o alinhamento da barra de ferramentas.
+- Função de arquivar removida da lista de Cadernos — não havia nenhum controle na interface que a ativasse.
+
+### Fixed
+
+#### Notas
+
+- "Nova nota" podia travar num composer em branco ao sair da tela sem digitar nada; agora restaura a última nota aberta do espaço.
+- Arrastar uma nota para outro caderno enquanto ela estava aberta desfazia a própria mudança (ordem incorreta entre o commit do editor e a atualização do caderno).
+- Três botões da coluna de Cadernos sem `border`/`background` explícitos apareciam com o estilo padrão do navegador fora de um preview em sandbox.
+
 ## [1.9.011] - 2026-09-15 01:51
 
 ### Added

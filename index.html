@@ -933,7 +933,7 @@
     position:absolute; top:0; right:-3px; bottom:0; width:6px; cursor:col-resize; z-index:5;
   }
   .notebooks-col-resize-handle:hover, .notebooks-col-resize-handle.dragging{background:var(--primary-light);}
-  .notebooks-col-header-row{display:flex; align-items:center; justify-content:space-between; padding:2px 2px 12px;}
+  .notebooks-col-header-row{display:flex; align-items:center; justify-content:space-between; padding:2px 2px 12px 8px;}
   .notebooks-col-header{font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--ink);}
   .notebook-search-wrap{position:relative; margin-bottom:12px; flex-shrink:0;}
   .notebook-search-wrap svg{
@@ -988,8 +988,11 @@
   .notebook-note-item span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .notebook-note-item:hover{background:var(--surface-2);}
   .notebook-note-item.active{background:var(--primary-light); color:var(--primary-dark); font-weight:600;}
-  .nb-note-pin{color:var(--primary-dark); flex-shrink:0;}
+  .nb-note-pin{color:var(--primary-dark); flex-shrink:0; cursor:pointer; border-radius:3px;}
+  .nb-note-pin:hover{color:var(--danger);}
   .notebook-note-item.is-pinned{color:var(--ink);}
+  .notebook-row.drag-over{background:var(--primary-light); outline:1.5px dashed var(--primary);}
+  .notebook-note-item.dragging{opacity:.4;}
   .notebook-add-note-btn{
     font-size:12px; color:var(--ink-soft); padding:7px 8px; border-radius:6px; text-align:left;
     background:var(--bg); border:1px solid var(--border); width:100%; margin-top:2px;
@@ -1017,6 +1020,11 @@
     color:var(--ink-faint); margin-bottom:8px;
   }
   .note-breadcrumb span{color:var(--ink-faint); opacity:.7;}
+  .note-breadcrumb-seg{
+    border:none; background:transparent; padding:2px 4px; margin:-2px -4px; border-radius:5px;
+    font-size:12px; font-weight:500; color:var(--ink-faint); cursor:pointer;
+  }
+  .note-breadcrumb-seg:hover{background:var(--surface-2); color:var(--ink-soft);}
   .note-detail-header{display:flex; align-items:flex-start; gap:14px;}
   .note-header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0; margin-top:2px;}
   .note-header-icon-btn{
@@ -1048,14 +1056,6 @@
     display:flex !important; border-top:none; border-bottom:none; margin:0; padding:0; position:static;
     background:transparent;
   }
-  .note-tags-row{margin-bottom:16px; display:flex; flex-wrap:wrap;}
-  .note-tag-chip{
-    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500;
-    padding:5px 10px; border-radius:20px; margin:0 6px 6px 0;
-    background:var(--surface-2); color:var(--ink); border:1px solid var(--border); cursor:pointer;
-  }
-  .note-tag-chip:hover{background:var(--border);}
-  .note-tag-chip svg{width:11px; height:11px; color:var(--ink-faint); flex-shrink:0;}
   .tp-header-actions{display:flex; align-items:center; gap:2px;}
   .tp-header-icon-btn{
     width:28px; height:28px; border:none; background:transparent; color:var(--ink-faint);
@@ -1647,7 +1647,6 @@
         <input type="text" id="searchInput" placeholder="Buscar...">
         <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
-      <div id="topbarNoteFilterSlot"></div>
       <button class="notification-btn" id="notificationBtn" title="Notificações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
       </button>
@@ -1755,14 +1754,13 @@ let activeCategoryFilter = null;
 let activeTagFilters = [];
 let activeCriticalityFilters = [];
 let criticalityFilterPopoverOpen = false;
-let activeNoteTagFilters = [];
-let noteTagFilterPopoverOpen = false;
 let activeNoteId = null;
 let creatingNewNote = false;
 let pendingNotePrefillTaskId = null;
 let pendingNoteNotebookId = null;
 const expandedNotebookIds = new Set();
 let notebookSearchTerm = '';
+let draggedNoteId = null;
 let searchTerm = '';
 let fileHandle = null;
 let dirty = false;
@@ -3064,6 +3062,38 @@ function openMoveGroupPortal(anchorBtn, currentCatId, onSelect){
 document.addEventListener('click', closeMoveGroupPortal);
 window.addEventListener('scroll', closeMoveGroupPortal, true);
 
+function openNotebookMovePortal(anchorBtn, categoryId, currentNotebookId, onSelect){
+  const portal = ensureMoveGroupPortal();
+  const wasOpen = portal.classList.contains('show') && portal.dataset.forBtn === anchorBtn.dataset.moveGroupId;
+  closeMoveGroupPortal();
+  if(wasOpen) return;
+  if(!anchorBtn.dataset.moveGroupId) anchorBtn.dataset.moveGroupId = uid('mvnb');
+  portal.dataset.forBtn = anchorBtn.dataset.moveGroupId;
+  const spaceNbs = state.notebooks
+    .filter(nb => nb.categoryId === categoryId)
+    .sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  portal.innerHTML = `
+    <div class="tp-tags-popover-list">
+      ${spaceNbs.length ? spaceNbs.map(nb => `
+        <div class="tp-tags-popover-row" data-nb="${nb.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--ink-faint); flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span class="tp-tags-popover-name">${escapeHtml(nb.name && nb.name.trim() ? nb.name : 'Caderno sem nome')}</span>
+          ${nb.id===currentNotebookId ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="13" height="13"><path d="M20 6L9 17l-5-5"/></svg>` : ''}
+        </div>
+      `).join('') : `<div style="font-size:12px;color:var(--ink-faint); padding:4px 2px;">Nenhum outro caderno neste espaço</div>`}
+    </div>
+  `;
+  portal.classList.add('show');
+  positionTagsPortalNear(portal, anchorBtn);
+  portal.onclick = e => e.stopPropagation();
+  portal.querySelectorAll('.tp-tags-popover-row').forEach(row => {
+    row.onclick = () => {
+      onSelect(row.dataset.nb);
+      closeMoveGroupPortal();
+    };
+  });
+}
+
 function ensureTagsPortal(){
   let portal = document.getElementById('tagsPickerPortal');
   if(!portal){
@@ -3134,11 +3164,6 @@ document.addEventListener('click', () => {
 });
 document.addEventListener('click', () => {
   if(criticalityFilterPopoverOpen){ criticalityFilterPopoverOpen = false; render(); }
-});
-document.addEventListener('click', () => {
-  if(noteTagFilterPopoverOpen){ noteTagFilterPopoverOpen = false; render(); }
-  const noteTagsPop = document.getElementById('noteTagsPopover');
-  if(noteTagsPop) noteTagsPop.style.display = 'none';
 });
 window.addEventListener('scroll', closeColorPortal, true);
 document.addEventListener('click', closeAllTaskMenus);
@@ -4110,7 +4135,12 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
   let noteNotebookId = isEditing ? existingNote.notebookId : forcedNotebookId;
 
   composer.innerHTML = `
-    <div class="note-breadcrumb" id="noteBreadcrumb"></div>
+    <div class="note-breadcrumb" id="noteBreadcrumb">
+      <button type="button" class="note-breadcrumb-seg" id="noteBreadcrumbSpace"></button>
+      <span>›</span>
+      <button type="button" class="note-breadcrumb-seg" id="noteBreadcrumbNotebook"></button>
+      <span>›</span>
+    </div>
     <div class="note-detail-header">
       <input type="text" class="note-title" placeholder="${isEditing?'':'Título da nota'}" value="${isEditing ? escapeHtml(existingNote.title||'') : (prefillTask ? escapeHtml(prefillTask.title||'') : '')}">
       <div class="note-header-actions">
@@ -4122,7 +4152,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
       <div class="rt-toolbar-slot"></div>
       <span class="note-toolbar-sep"></span>
       <div class="note-meta-row">
-        <button type="button" class="move-group-btn" id="noteMoveGroupBtn" title="Mover de grupo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M12 11v4M10 13h4"/></svg></button>
         <span class="group-current-chip" id="noteGroupChip"></span>
         <button type="button" class="note-attach-btn" id="composerAttachBtn" title="Anexar imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.19 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
         <input type="file" id="composerAttachInput" accept="image/*" multiple style="display:none;">
@@ -4130,11 +4159,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
           <span id="noteLinkedTaskLabel">Vincular tarefa</span>
         </button>
-      </div>
-    </div>
-    <div class="note-tags-row">
-      <div class="tp-tags-selected" id="noteTagsSelected">
-        <button type="button" class="tp-tags-add-btn" id="noteTagsToggleBtn">+ Tag</button>
       </div>
     </div>
     <div class="note-body-input" contenteditable="true" spellcheck="false" data-placeholder="Escreva uma nota..."></div>
@@ -4146,7 +4170,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
   const toolbarEl = buildRichToolbar(bodyInputEl);
   composer.querySelector('.rt-toolbar-slot').replaceWith(toolbarEl);
 
-  let noteTagIds = isEditing ? (existingNote.tagIds||[]).slice() : [];
   let noteLinkedTaskId = isEditing ? (existingNote.linkedTaskId || null) : (prefillTask ? prefillTask.id : null);
   function renderNoteLinkedTaskLabel(){
     const label = composer.querySelector('#noteLinkedTaskLabel');
@@ -4175,26 +4198,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
     });
   };
   renderNoteLinkedTaskLabel();
-  function renderNoteTagsSelected(){
-    const box = composer.querySelector('#noteTagsSelected');
-    const addBtn = box.querySelector('#noteTagsToggleBtn');
-    box.querySelectorAll('.note-tag-chip').forEach(el => el.remove());
-    noteTagIds.map(id => state.tags.find(tg=>tg.id===id)).filter(Boolean).forEach(tg => {
-      const chip = document.createElement('span');
-      chip.className = 'note-tag-chip';
-      chip.title = 'Clique para remover';
-      chip.innerHTML = `${escapeHtml(tg.name)}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
-      chip.onclick = (e) => {
-        e.stopPropagation();
-        noteTagIds = noteTagIds.filter(id => id !== tg.id);
-        renderNoteTagsSelected();
-      };
-      box.insertBefore(chip, addBtn);
-    });
-  }
-  renderNoteTagsSelected();
-
-  const noteTagsToggleBtn = composer.querySelector('#noteTagsToggleBtn');
 
   function renderNoteGroupChip(){
     const cat = catById(noteCategoryId);
@@ -4203,18 +4206,16 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
     chip.style.color = cat ? cat.color : 'var(--ink-soft)';
     chip.innerHTML = `<span class="cat-swatch" style="background:${cat?cat.color:'var(--ink-faint)'}"></span>${escapeHtml(cat?cat.name:'Sem espaço')}`;
     const nb = noteNotebookId ? state.notebooks.find(x => x.id === noteNotebookId) : null;
-    const crumb = composer.querySelector('#noteBreadcrumb');
-    if(crumb) crumb.innerHTML = `${escapeHtml(cat?cat.name:'Sem espaço')} <span>›</span> ${escapeHtml(nb&&nb.name?nb.name:'Notas')} <span>›</span>`;
+    const spaceSeg = composer.querySelector('#noteBreadcrumbSpace');
+    const notebookSeg = composer.querySelector('#noteBreadcrumbNotebook');
+    if(spaceSeg) spaceSeg.textContent = cat ? cat.name : 'Sem espaço';
+    if(notebookSeg) notebookSeg.textContent = nb && nb.name ? nb.name : 'Notas';
   }
   renderNoteGroupChip();
-  composer.querySelector('#noteMoveGroupBtn').onclick = (e) => {
+  composer.querySelector('#noteBreadcrumbSpace').onclick = (e) => {
     e.stopPropagation();
     openMoveGroupPortal(e.currentTarget, noteCategoryId, (newCatId) => {
       noteCategoryId = newCatId;
-      noteTagIds = noteTagIds.filter(id => {
-        const tg = state.tags.find(x => x.id === id);
-        return tg && (!tg.categoryId || tg.categoryId === noteCategoryId);
-      });
       let nb = state.notebooks.find(x => x.categoryId === newCatId);
       if(!nb){
         nb = { id: uid('nb'), name: 'Notas', categoryId: newCatId, createdAt: Date.now() };
@@ -4223,28 +4224,14 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
       noteNotebookId = nb.id;
       expandedNotebookIds.add(nb.id);
       renderNoteGroupChip();
-      renderNoteTagsSelected();
     });
   };
-
-  noteTagsToggleBtn.onclick = (e) => {
+  composer.querySelector('#noteBreadcrumbNotebook').onclick = (e) => {
     e.stopPropagation();
-    const portal = ensureTagsPortal();
-    const wasOpen = portal.classList.contains('show');
-    closeTagsPortal();
-    if(wasOpen) return;
-    portal.classList.add('show');
-    positionTagsPortalNear(portal, noteTagsToggleBtn);
-    portal.onclick = e2 => e2.stopPropagation();
-    renderUnifiedTagPicker(portal, {
-      categoryId: noteCategoryId,
-      isSelected: (tagId) => noteTagIds.includes(tagId),
-      onToggle: (tagId) => {
-        if(noteTagIds.includes(tagId)) noteTagIds = noteTagIds.filter(id => id !== tagId);
-        else noteTagIds.push(tagId);
-        renderNoteTagsSelected();
-      },
-      onChanged: () => { renderNoteTagsSelected(); }
+    openNotebookMovePortal(e.currentTarget, noteCategoryId, noteNotebookId, (newNbId) => {
+      noteNotebookId = newNbId;
+      expandedNotebookIds.add(newNbId);
+      renderNoteGroupChip();
     });
   };
 
@@ -4319,7 +4306,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
       targetNote.categoryId = categoryId;
       targetNote.notebookId = noteNotebookId;
       targetNote.attachments = attachments;
-      targetNote.tagIds = noteTagIds;
       targetNote.linkedTaskId = noteLinkedTaskId;
       targetNote.updatedAt = Date.now();
     } else {
@@ -4328,7 +4314,7 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
         categoryId, notebookId: noteNotebookId,
         pinned:false, archived:false,
         attachments,
-        tagIds: noteTagIds,
+        tagIds: [],
         linkedTaskId: noteLinkedTaskId,
         createdAt: Date.now(), updatedAt: Date.now()
       };
@@ -4379,7 +4365,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.020';
+const APP_VERSION = '1.10.040';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -5474,53 +5460,9 @@ function renderNotes(){
   const nbSearchCursor = nbSearchFocused ? document.activeElement.selectionStart : null;
   view.innerHTML = '';
 
-  const noteFilterBar = document.createElement('div');
-  noteFilterBar.innerHTML = `
-    <div class="tag-filter-control" style="margin-left:0;">
-      <button type="button" class="tag-filter-btn" id="noteTagFilterBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.24H4a1 1 0 00-1 1v5.59a2 2 0 00.59 1.41l9.58 9.58a2 2 0 002.82 0l5.6-5.59a2 2 0 000-2.82z"/><circle cx="7" cy="7" r="1.3" fill="currentColor" stroke="none"/></svg>
-        <span id="noteTagFilterLabel">${activeNoteTagFilters.length ? activeNoteTagFilters.length + ' tag(s)' : 'Todas as tags'}</span>
-      </button>
-      <div class="tag-filter-popover" id="noteTagFilterPopover" style="display:${noteTagFilterPopoverOpen?'block':'none'};">
-        ${(() => {
-          const usedTagIds = new Set();
-          state.notes.forEach(n => (n.tagIds||[]).forEach(id => usedTagIds.add(id)));
-          const usableTags = state.tags.filter(tg => usedTagIds.has(tg.id));
-          if(usableTags.length === 0) return '<div style="font-size:12px;color:var(--ink-faint); padding:4px 2px;">Nenhuma tag em uso nas notas</div>';
-          return usableTags.map(tg => `
-            <label class="tag-filter-row">
-              <input type="checkbox" data-tag="${tg.id}" ${activeNoteTagFilters.includes(tg.id)?'checked':''}>
-              <span class="cat-swatch" style="background:${tg.color}"></span>
-              ${escapeHtml(tg.name)}
-            </label>
-          `).join('');
-        })()}
-      </div>
-    </div>
-  `;
-  const noteTagFilterBtn = noteFilterBar.querySelector('#noteTagFilterBtn');
-  const noteTagFilterPopover = noteFilterBar.querySelector('#noteTagFilterPopover');
-  noteTagFilterBtn.onclick = (e) => {
-    e.stopPropagation();
-    noteTagFilterPopoverOpen = !noteTagFilterPopoverOpen;
-    noteTagFilterPopover.style.display = noteTagFilterPopoverOpen ? 'block' : 'none';
-  };
-  noteTagFilterPopover.addEventListener('click', e => e.stopPropagation());
-  noteTagFilterPopover.querySelectorAll('input[type=checkbox]').forEach(cb => {
-    cb.addEventListener('change', e => {
-      const tagId = e.target.dataset.tag;
-      if(e.target.checked){ if(!activeNoteTagFilters.includes(tagId)) activeNoteTagFilters.push(tagId); }
-      else { activeNoteTagFilters = activeNoteTagFilters.filter(id => id !== tagId); }
-      render();
-    });
-  });
-  const topbarSlot = document.getElementById('topbarNoteFilterSlot');
-  if(topbarSlot){ topbarSlot.innerHTML = ''; topbarSlot.appendChild(noteFilterBar.firstElementChild); }
-
   const term = searchTerm.trim().toLowerCase();
   function matches(n){
     if(term && !(n.title + stripHtml(n.body)).toLowerCase().includes(term)) return false;
-    if(activeNoteTagFilters.length && !(n.tagIds||[]).some(id => activeNoteTagFilters.includes(id))) return false;
     return true;
   }
 
@@ -5569,7 +5511,7 @@ function renderNotes(){
         </div>
         ${expanded ? `
         <div class="notebook-notes">
-          ${nbNotes.map(n => `<div class="notebook-note-item ${n.id===activeNoteId?'active':''} ${n.pinned?'is-pinned':''}" data-note-id="${n.id}">${n.pinned?'<svg class="nb-note-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 17v5M9 10.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V16a1 1 0 001 1h12a1 1 0 001-1v-.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V7a1 1 0 011-1 2 2 0 000-4H8a2 2 0 000 4 1 1 0 011 1z"/></svg>':''}<span>${escapeHtml(n.title||'Sem título')}</span></div>`).join('')}
+          ${nbNotes.map(n => `<div class="notebook-note-item ${n.id===activeNoteId?'active':''} ${n.pinned?'is-pinned':''}" data-note-id="${n.id}" draggable="true">${n.pinned?`<svg class="nb-note-pin" data-unpin-note-id="${n.id}" title="Desafixar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 17v5M9 10.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V16a1 1 0 001 1h12a1 1 0 001-1v-.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V7a1 1 0 011-1 2 2 0 000-4H8a2 2 0 000 4 1 1 0 011 1z"/></svg>`:''}<span>${escapeHtml(n.title||'Sem título')}</span></div>`).join('')}
           <button type="button" class="notebook-add-note-btn" data-nb-id="${nb.id}">+ Nova nota</button>
         </div>` : ''}
       </div>
@@ -5679,9 +5621,50 @@ function renderNotes(){
       else expandedNotebookIds.add(id);
       renderNotes();
     });
+    row.addEventListener('dragover', (e) => {
+      if(!draggedNoteId) return;
+      e.preventDefault();
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      if(!draggedNoteId) return;
+      const n = state.notes.find(x => x.id === draggedNoteId);
+      const nb = state.notebooks.find(x => x.id === row.dataset.nbId);
+      if(!n || !nb || n.notebookId === nb.id) return;
+      if(currentNoteComposerCommit) currentNoteComposerCommit();
+      n.notebookId = nb.id;
+      expandedNotebookIds.add(nb.id);
+      markDirty();
+      renderNotes();
+    });
   });
   notebooksCol.querySelectorAll('.notebook-note-item[data-note-id]').forEach(item => {
     item.addEventListener('click', () => selectNote(item.dataset.noteId));
+    item.addEventListener('dragstart', (e) => {
+      draggedNoteId = item.dataset.noteId;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      draggedNoteId = null;
+      item.classList.remove('dragging');
+      notebooksCol.querySelectorAll('.notebook-row.drag-over').forEach(r => r.classList.remove('drag-over'));
+    });
+  });
+  notebooksCol.querySelectorAll('.nb-note-pin[data-unpin-note-id]').forEach(pin => {
+    pin.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const n = state.notes.find(x => x.id === pin.dataset.unpinNoteId);
+      if(!n) return;
+      n.pinned = false;
+      n.pinnedAt = null;
+      if(currentNoteComposerCommit) currentNoteComposerCommit();
+      markDirty();
+      renderNotes();
+    });
   });
   notebooksCol.querySelectorAll('.notebook-add-note-btn[data-nb-id]').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -6579,9 +6562,10 @@ document.getElementById('avatarMenuSettingsBtn').onclick = () => {
   document.getElementById('avatarDropdownMenu').style.display = 'none';
   openSettingsView('personalizacao');
 };
-document.getElementById('avatarMenuLogoutBtn').onclick = () => {
+document.getElementById('avatarMenuLogoutBtn').onclick = (e) => {
+  e.stopPropagation();
+  disconnectFile(e);
   document.getElementById('avatarDropdownMenu').style.display = 'none';
-  disconnectFile();
 };
 
 /* ===================== RENDER PRINCIPAL ===================== */
@@ -6589,10 +6573,6 @@ const VIEW_TITLES = { dashboard:'Visão geral', tasks:'Tarefas', notes:'Notas', 
 function render(){
   applySidebarCollapsed();
   renderSpaceSelector();
-  if(currentView !== 'notes'){
-    const topbarSlot = document.getElementById('topbarNoteFilterSlot');
-    if(topbarSlot) topbarSlot.innerHTML = '';
-  }
   document.getElementById('viewTitle').textContent = VIEW_TITLES[currentView];
   const subtitleEl = document.getElementById('viewSubtitle');
   if(currentView === 'dashboard'){
