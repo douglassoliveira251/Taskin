@@ -930,7 +930,17 @@
     padding:16px 14px; height:100%; overflow-y:auto; box-sizing:border-box;
   }
   .notebooks-col-header-row{display:flex; align-items:center; justify-content:space-between; padding:2px 2px 12px;}
-  .notebooks-col-header{font-size:11px; font-weight:700; color:var(--ink-faint); letter-spacing:.04em; text-transform:uppercase;}
+  .notebooks-col-header{font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--ink);}
+  .notebook-search-wrap{position:relative; margin-bottom:12px; flex-shrink:0;}
+  .notebook-search-wrap svg{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    width:13px; height:13px; color:var(--ink-faint); pointer-events:none;
+  }
+  .notebook-search-input{
+    width:100%; padding:7px 10px 7px 30px; border:1px solid var(--border); border-radius:8px;
+    background:var(--bg); font-size:12.5px; color:var(--ink); box-sizing:border-box;
+  }
+  .notebook-search-input:focus{outline:none; border-color:var(--primary);}
   .notebooks-space-header{
     display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--ink-soft);
     padding:14px 2px 6px; text-transform:uppercase; letter-spacing:.03em;
@@ -938,21 +948,20 @@
   .notebooks-space-header:first-child{padding-top:0;}
   .notebooks-space-header .cat-swatch{width:7px; height:7px;}
   .notebook-new-btn-top{
-    width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    color:var(--ink-faint); background:transparent; border:none; flex-shrink:0;
+    width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    color:#fff; background:var(--primary); border:none; flex-shrink:0; box-shadow:var(--shadow-sm);
   }
-  .notebook-new-btn-top:hover{background:var(--surface-2); color:var(--primary);}
-  .notebook-new-btn-top svg{width:14px; height:14px;}
+  .notebook-new-btn-top:hover{background:var(--primary-dark);}
+  .notebook-new-btn-top svg{width:12px; height:12px;}
   .notebooks-list{display:flex; flex-direction:column; gap:3px; flex:1;}
   .notebook-group{margin-bottom:2px;}
   .notebook-row{
-    display:flex; align-items:center; gap:8px; padding:9px 8px 9px 9px; border-radius:8px; cursor:pointer; min-width:0;
-    border-left:3px solid var(--nb-color, var(--border));
+    display:flex; align-items:center; gap:8px; padding:9px 8px; border-radius:8px; cursor:pointer; min-width:0;
   }
   .notebook-row:hover{background:var(--surface-2);}
   .notebook-chevron{width:12px; height:12px; flex-shrink:0; color:var(--ink-faint); transition:transform .12s;}
   .notebook-chevron.expanded{transform:rotate(90deg);}
-  .notebook-icon{width:16px; height:16px; flex-shrink:0; color:var(--nb-color, var(--ink-soft));}
+  .notebook-icon{width:16px; height:16px; flex-shrink:0; color:var(--ink-soft);}
   .notebook-name{
     flex:1; min-width:0; font-family:var(--font-display); font-size:13.5px; font-weight:700; color:var(--ink);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -975,11 +984,11 @@
   .notebook-note-item span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .notebook-note-item:hover{background:var(--surface-2);}
   .notebook-note-item.active{background:var(--primary-light); color:var(--primary-dark); font-weight:600;}
-  .nb-note-pin{color:var(--accent); flex-shrink:0;}
+  .nb-note-pin{color:var(--primary-dark); flex-shrink:0;}
   .notebook-note-item.is-pinned{color:var(--ink);}
   .notebook-add-note-btn{
-    font-size:12px; color:var(--ink-faint); padding:7px 8px; border-radius:6px; text-align:left;
-    background:transparent; border:none; width:100%;
+    font-size:12px; color:var(--ink-soft); padding:7px 8px; border-radius:6px; text-align:left;
+    background:var(--bg); border:1px solid var(--border); width:100%; margin-top:2px;
   }
   .notebook-add-note-btn:hover{background:var(--surface-2); color:var(--primary);}
   .notebook-empty-hint{font-size:11.5px; color:var(--ink-faint); padding:5px 8px;}
@@ -987,12 +996,6 @@
     flex:1; min-width:0; font-size:13px; font-weight:600; color:var(--ink); background:var(--surface);
     border:1px solid var(--primary); border-radius:5px; padding:2px 5px;
   }
-  .notebook-menu-popover{
-    position:fixed; z-index:70; min-width:150px; background:var(--surface); border:1px solid var(--border);
-    border-radius:var(--radius-sm); box-shadow:var(--shadow-md); padding:5px; display:flex; flex-direction:column;
-  }
-  .notebook-menu-popover button{padding:8px 10px; border-radius:6px; font-size:13px; text-align:left; color:var(--ink);}
-  .notebook-menu-popover button:hover{background:var(--surface-2);}
 
   .note-detail-col{
     flex:1; min-width:0; height:100%; overflow-y:auto;
@@ -1005,8 +1008,22 @@
   .note-detail-empty svg{width:48px; height:48px; opacity:.5;}
   .note-detail-empty p{font-size:13.5px; max-width:260px;}
   .note-composer-inline{display:flex; flex-direction:column; max-width:760px; margin:0 auto; width:100%;}
-  .note-detail-header{display:flex; align-items:flex-start; gap:10px;}
-  .note-header-actions{display:flex; align-items:center; gap:2px; flex-shrink:0; margin-top:4px;}
+  .note-breadcrumb{
+    display:flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
+    color:var(--ink-faint); margin-bottom:8px;
+  }
+  .note-breadcrumb span{color:var(--ink-faint); opacity:.7;}
+  .note-detail-header{display:flex; align-items:flex-start; gap:14px;}
+  .note-header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0; margin-top:2px;}
+  .note-header-icon-btn{
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    border:1px solid var(--border); background:var(--surface); color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .note-header-icon-btn:hover{background:var(--surface-2); color:var(--ink);}
+  .note-header-icon-btn svg{width:16px; height:16px;}
+  .note-header-icon-btn.danger{color:var(--danger);}
+  .note-header-icon-btn.danger:hover{background:var(--danger-light);}
   .note-composer-inline .note-title{
     flex:1; min-width:0;
     font-family:var(--font-display); font-size:24px; font-weight:700; width:100%;
@@ -1027,7 +1044,14 @@
     display:flex !important; border-top:none; border-bottom:none; margin:0; padding:0; position:static;
     background:transparent;
   }
-  .note-tags-row{margin-bottom:16px;}
+  .note-tags-row{margin-bottom:16px; display:flex; flex-wrap:wrap;}
+  .note-tag-chip{
+    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500;
+    padding:5px 10px; border-radius:20px; margin:0 6px 6px 0;
+    background:var(--surface-2); color:var(--ink); border:1px solid var(--border); cursor:pointer;
+  }
+  .note-tag-chip:hover{background:var(--border);}
+  .note-tag-chip svg{width:11px; height:11px; color:var(--ink-faint); flex-shrink:0;}
   .tp-header-actions{display:flex; align-items:center; gap:2px;}
   .tp-header-icon-btn{
     width:28px; height:28px; border:none; background:transparent; color:var(--ink-faint);
@@ -1742,6 +1766,7 @@ let creatingNewNote = false;
 let pendingNotePrefillTaskId = null;
 let pendingNoteNotebookId = null;
 const expandedNotebookIds = new Set();
+let notebookSearchTerm = '';
 let searchTerm = '';
 let fileHandle = null;
 let dirty = false;
@@ -4088,11 +4113,12 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
   let noteNotebookId = isEditing ? existingNote.notebookId : forcedNotebookId;
 
   composer.innerHTML = `
+    <div class="note-breadcrumb" id="noteBreadcrumb"></div>
     <div class="note-detail-header">
       <input type="text" class="note-title" placeholder="${isEditing?'':'Título da nota'}" value="${isEditing ? escapeHtml(existingNote.title||'') : (prefillTask ? escapeHtml(prefillTask.title||'') : '')}">
       <div class="note-header-actions">
-        ${isEditing ? `<button type="button" class="tp-header-icon-btn ${existingNote.pinned?'active':''}" id="composerPinBtn" title="${existingNote.pinned?'Desafixar':'Fixar'}">${pinIconSvg(existingNote.pinned)}</button>` : ''}
-        ${isEditing ? `<button type="button" class="tp-header-icon-btn danger" id="composerDeleteBtn" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z"/></svg></button>` : ''}
+        ${isEditing ? `<button type="button" class="note-header-icon-btn" id="composerPinBtn" title="${existingNote.pinned?'Desafixar':'Fixar'}">${pinIconSvg(existingNote.pinned)}</button>` : ''}
+        ${isEditing ? `<button type="button" class="note-header-icon-btn danger" id="composerDeleteBtn" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z"/></svg></button>` : ''}
       </div>
     </div>
     <div class="note-toolbar-row" id="noteToolbarRow">
@@ -4110,7 +4136,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
     </div>
     <div class="note-tags-row">
       <div class="tp-tags-selected" id="noteTagsSelected">
-        ${(isEditing ? (existingNote.tagIds||[]) : []).map(id => state.tags.find(tg=>tg.id===id)).filter(Boolean).map(tg => `<span class="tp-tag-chip active" style="background:${tg.color}">${escapeHtml(tg.name)}</span>`).join('')}
         <button type="button" class="tp-tags-add-btn" id="noteTagsToggleBtn">+ Tag</button>
       </div>
     </div>
@@ -4155,15 +4180,21 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
   function renderNoteTagsSelected(){
     const box = composer.querySelector('#noteTagsSelected');
     const addBtn = box.querySelector('#noteTagsToggleBtn');
-    box.querySelectorAll('.tp-tag-chip').forEach(el => el.remove());
+    box.querySelectorAll('.note-tag-chip').forEach(el => el.remove());
     noteTagIds.map(id => state.tags.find(tg=>tg.id===id)).filter(Boolean).forEach(tg => {
       const chip = document.createElement('span');
-      chip.className = 'tp-tag-chip active';
-      chip.style.background = tg.color;
-      chip.textContent = tg.name;
+      chip.className = 'note-tag-chip';
+      chip.title = 'Clique para remover';
+      chip.innerHTML = `${escapeHtml(tg.name)}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+      chip.onclick = (e) => {
+        e.stopPropagation();
+        noteTagIds = noteTagIds.filter(id => id !== tg.id);
+        renderNoteTagsSelected();
+      };
       box.insertBefore(chip, addBtn);
     });
   }
+  renderNoteTagsSelected();
 
   const noteTagsToggleBtn = composer.querySelector('#noteTagsToggleBtn');
 
@@ -4173,6 +4204,9 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
     chip.style.background = cat ? cat.color + '22' : 'var(--surface-2)';
     chip.style.color = cat ? cat.color : 'var(--ink-soft)';
     chip.innerHTML = `<span class="cat-swatch" style="background:${cat?cat.color:'var(--ink-faint)'}"></span>${escapeHtml(cat?cat.name:'Sem espaço')}`;
+    const nb = noteNotebookId ? state.notebooks.find(x => x.id === noteNotebookId) : null;
+    const crumb = composer.querySelector('#noteBreadcrumb');
+    if(crumb) crumb.innerHTML = `${escapeHtml(cat?cat.name:'Sem espaço')} <span>›</span> ${escapeHtml(nb&&nb.name?nb.name:'Notas')} <span>›</span>`;
   }
   renderNoteGroupChip();
   composer.querySelector('#noteMoveGroupBtn').onclick = (e) => {
@@ -5438,6 +5472,8 @@ function closeNotebookMenu(){
 
 function renderNotes(){
   const view = document.getElementById('notesView');
+  const nbSearchFocused = document.activeElement && document.activeElement.id === 'notebookSearchInput';
+  const nbSearchCursor = nbSearchFocused ? document.activeElement.selectionStart : null;
   view.innerHTML = '';
 
   const noteFilterBar = document.createElement('div');
@@ -5490,8 +5526,10 @@ function renderNotes(){
     return true;
   }
 
+  const nbSearchLower = notebookSearchTerm.trim().toLowerCase();
   const spaceNotebooks = state.notebooks
     .filter(nb => !activeCategoryFilter || nb.categoryId === activeCategoryFilter)
+    .filter(nb => !nbSearchLower || (nb.name||'').toLowerCase().includes(nbSearchLower))
     .sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
 
   // se o espaço mudou desde o último render, soltar a nota ativa para restaurar a do novo espaço
@@ -5521,10 +5559,9 @@ function renderNotes(){
     const nbNotes = state.notes.filter(n => n.notebookId === nb.id && !n.archived && matches(n))
       .sort((a,b) => (b.pinned - a.pinned) || ((b.pinnedAt||0) - (a.pinnedAt||0)) || (b.updatedAt - a.updatedAt));
     const expanded = expandedNotebookIds.has(nb.id);
-    const nbCat = catById(nb.categoryId);
     return `
       <div class="notebook-group">
-        <div class="notebook-row" data-nb-id="${nb.id}" style="--nb-color:${nbCat?nbCat.color:'var(--border)'};">
+        <div class="notebook-row" data-nb-id="${nb.id}">
           <svg class="notebook-chevron ${expanded?'expanded':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           <svg class="notebook-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
           <span class="notebook-name">${escapeHtml(nb.name && nb.name.trim() ? nb.name : 'Caderno sem nome')}</span>
@@ -5551,6 +5588,9 @@ function renderNotes(){
       catNotebooks.forEach(nb => { nbHtml += notebookGroupHtml(nb); });
     });
   }
+  if(!nbHtml && nbSearchLower){
+    nbHtml = `<div class="notebook-empty-hint">Nenhum caderno encontrado.</div>`;
+  }
   notebooksCol.innerHTML = `
     <div class="notebooks-col-header-row">
       <div class="notebooks-col-header">Cadernos</div>
@@ -5558,8 +5598,17 @@ function renderNotes(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
+    <div class="notebook-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" class="notebook-search-input" id="notebookSearchInput" placeholder="Buscar caderno..." value="${escapeHtml(notebookSearchTerm)}">
+    </div>
     <div class="notebooks-list">${nbHtml}</div>
   `;
+  const notebookSearchInput = notebooksCol.querySelector('#notebookSearchInput');
+  notebookSearchInput.addEventListener('input', (e) => {
+    notebookSearchTerm = e.target.value;
+    renderNotes();
+  });
 
   const detailCol = document.createElement('div');
   detailCol.className = 'note-detail-col';
@@ -5584,6 +5633,10 @@ function renderNotes(){
   layout.appendChild(notebooksCol);
   layout.appendChild(detailCol);
   view.appendChild(layout);
+  if(nbSearchFocused){
+    notebookSearchInput.focus();
+    notebookSearchInput.setSelectionRange(nbSearchCursor, nbSearchCursor);
+  }
 
   function selectNote(noteId){
     if(currentNoteComposerCommit) currentNoteComposerCommit();
@@ -5628,17 +5681,27 @@ function renderNotes(){
       if(!nb) return;
       const pop = document.createElement('div');
       pop.id = 'notebookMenuPopover';
-      pop.className = 'notebook-menu-popover';
+      pop.className = 'task-menu-portal show';
       pop.dataset.nbId = nb.id;
       pop.innerHTML = `
-        <button type="button" data-act="rename">Renomear</button>
-        <button type="button" data-act="delete" style="color:var(--danger);">Excluir</button>
+        <button type="button" class="task-menu-item" data-act="rename"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Renomear</button>
+        <button type="button" class="task-menu-item" data-act="move-space"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>Mover de Espaço</button>
+        <button type="button" class="task-menu-item danger" data-act="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m2 0v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6h12z"/></svg>Excluir caderno</button>
       `;
       document.body.appendChild(pop);
       const r = btn.getBoundingClientRect();
-      pop.style.left = Math.min(r.left, window.innerWidth - 170) + 'px';
+      pop.style.left = Math.min(r.left, window.innerWidth - 190) + 'px';
       pop.style.top = (r.bottom + 4) + 'px';
       pop.onclick = e2 => e2.stopPropagation();
+      pop.querySelector('[data-act=move-space]').onclick = (e2) => {
+        openMoveGroupPortal(e2.currentTarget, nb.categoryId, (newCatId) => {
+          nb.categoryId = newCatId;
+          state.notes.forEach(n => { if(n.notebookId === nb.id) n.categoryId = newCatId; });
+          closeNotebookMenu();
+          markDirty();
+          renderNotes();
+        });
+      };
       pop.querySelector('[data-act=rename]').onclick = () => {
         closeNotebookMenu();
         const row = notebooksCol.querySelector(`.notebook-row[data-nb-id="${nb.id}"] .notebook-name`);
