@@ -380,7 +380,7 @@
   .view-title{font-family:var(--font-display); font-weight:700; font-size:20px;}
   .view-subtitle{font-size:12px; color:var(--ink-faint); text-transform:capitalize; margin-top:1px;}
   .search-wrap{
-    flex:1; max-width:360px; position:relative; margin-left:8px;
+    flex:0 0 auto; width:280px; position:relative; margin-left:auto;
   }
   .search-wrap input{
     width:100%; padding:8px 35px 8px 32px;
@@ -935,16 +935,6 @@
   .notebooks-col-resize-handle:hover, .notebooks-col-resize-handle.dragging{background:var(--primary-light);}
   .notebooks-col-header-row{display:flex; align-items:center; justify-content:space-between; padding:2px 2px 12px 8px;}
   .notebooks-col-header{font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--ink);}
-  .notebook-search-wrap{position:relative; margin-bottom:12px; flex-shrink:0;}
-  .notebook-search-wrap svg{
-    position:absolute; left:10px; top:50%; transform:translateY(-50%);
-    width:13px; height:13px; color:var(--ink-faint); pointer-events:none;
-  }
-  .notebook-search-input{
-    width:100%; padding:7px 10px 7px 30px; border:1px solid var(--border); border-radius:8px;
-    background:var(--bg); font-size:12.5px; color:var(--ink); box-sizing:border-box;
-  }
-  .notebook-search-input:focus{outline:none; border-color:var(--primary);}
   .notebooks-space-header{
     display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--ink-soft);
     padding:14px 2px 6px; text-transform:uppercase; letter-spacing:.03em;
@@ -1759,7 +1749,6 @@ let creatingNewNote = false;
 let pendingNotePrefillTaskId = null;
 let pendingNoteNotebookId = null;
 const expandedNotebookIds = new Set();
-let notebookSearchTerm = '';
 let draggedNoteId = null;
 let searchTerm = '';
 let fileHandle = null;
@@ -5456,8 +5445,6 @@ function closeNotebookMenu(){
 
 function renderNotes(){
   const view = document.getElementById('notesView');
-  const nbSearchFocused = document.activeElement && document.activeElement.id === 'notebookSearchInput';
-  const nbSearchCursor = nbSearchFocused ? document.activeElement.selectionStart : null;
   view.innerHTML = '';
 
   const term = searchTerm.trim().toLowerCase();
@@ -5466,10 +5453,8 @@ function renderNotes(){
     return true;
   }
 
-  const nbSearchLower = notebookSearchTerm.trim().toLowerCase();
   const spaceNotebooks = state.notebooks
     .filter(nb => !activeCategoryFilter || nb.categoryId === activeCategoryFilter)
-    .filter(nb => !nbSearchLower || (nb.name||'').toLowerCase().includes(nbSearchLower))
     .sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
 
   // se o espaço mudou desde o último render, soltar a nota ativa para restaurar a do novo espaço
@@ -5529,19 +5514,12 @@ function renderNotes(){
       catNotebooks.forEach(nb => { nbHtml += notebookGroupHtml(nb); });
     });
   }
-  if(!nbHtml && nbSearchLower){
-    nbHtml = `<div class="notebook-empty-hint">Nenhum caderno encontrado.</div>`;
-  }
   notebooksCol.innerHTML = `
     <div class="notebooks-col-header-row">
       <div class="notebooks-col-header">Cadernos</div>
       <button type="button" class="notebook-new-btn-top" id="newNotebookBtn" title="Novo caderno">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       </button>
-    </div>
-    <div class="notebook-search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input type="text" class="notebook-search-input" id="notebookSearchInput" placeholder="Buscar caderno..." value="${escapeHtml(notebookSearchTerm)}">
     </div>
     <div class="notebooks-list">${nbHtml}</div>
     <div class="notebooks-col-resize-handle" id="notebooksColResizeHandle" title="Arrastar para redimensionar"></div>
@@ -5570,12 +5548,6 @@ function renderNotes(){
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
-  const notebookSearchInput = notebooksCol.querySelector('#notebookSearchInput');
-  notebookSearchInput.addEventListener('input', (e) => {
-    notebookSearchTerm = e.target.value;
-    renderNotes();
-  });
-
   const detailCol = document.createElement('div');
   detailCol.className = 'note-detail-col';
   const activeNote = activeNoteId ? state.notes.find(n => n.id === activeNoteId) : null;
@@ -5599,10 +5571,6 @@ function renderNotes(){
   layout.appendChild(notebooksCol);
   layout.appendChild(detailCol);
   view.appendChild(layout);
-  if(nbSearchFocused){
-    notebookSearchInput.focus();
-    notebookSearchInput.setSelectionRange(nbSearchCursor, nbSearchCursor);
-  }
 
   function selectNote(noteId){
     if(currentNoteComposerCommit) currentNoteComposerCommit();
