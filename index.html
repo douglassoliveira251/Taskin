@@ -221,7 +221,7 @@
   }
   .notification-btn:hover{background:var(--surface-2); color:var(--ink);}
   .notification-btn svg{width:17px; height:17px;}
-  .topbar-avatar-wrap{position:relative; margin-left:10px;}
+  .topbar-avatar-wrap{position:relative;}
   .topbar-avatar-btn{
     border:none; background:transparent; padding:0; border-radius:50%; cursor:pointer;
     width:36px; height:36px; flex-shrink:0;
@@ -379,8 +379,9 @@
   .view-title-wrap{display:flex; flex-direction:column; justify-content:center;}
   .view-title{font-family:var(--font-display); font-weight:700; font-size:20px;}
   .view-subtitle{font-size:12px; color:var(--ink-faint); text-transform:capitalize; margin-top:1px;}
+  .topbar-right-group{display:flex; align-items:center; gap:14px; margin-left:auto;}
   .search-wrap{
-    flex:0 0 auto; width:280px; position:relative; margin-left:auto;
+    flex:0 0 auto; width:280px; position:relative;
   }
   .search-wrap input{
     width:100%; padding:8px 35px 8px 32px;
@@ -976,14 +977,23 @@
     display:flex; align-items:center; gap:6px; padding:7px 8px; border-radius:6px; font-size:12.5px;
     color:var(--ink-soft); cursor:pointer; overflow:hidden;
   }
-  .notebook-note-item span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .notebook-note-item span{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .notebook-note-item:hover{background:var(--surface-2);}
   .notebook-note-item.active{background:var(--primary-light); color:var(--primary-dark); font-weight:600;}
-  .nb-note-pin{color:var(--primary-dark); flex-shrink:0; cursor:pointer; border-radius:3px;}
-  .nb-note-pin:hover{color:var(--danger);}
+  .nb-note-pin-btn{
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; order:-1;
+    width:16px; height:16px; padding:0; border:none; background:transparent;
+    color:var(--primary-dark); border-radius:3px; opacity:0; cursor:pointer;
+  }
+  .notebook-note-item:hover .nb-note-pin-btn, .nb-note-pin-btn.pinned{opacity:1;}
+  .nb-note-pin-btn:hover{background:var(--surface); color:var(--danger);}
   .notebook-note-item.is-pinned{color:var(--ink);}
   .notebook-row.drag-over{background:var(--primary-light); outline:1.5px dashed var(--primary);}
-  .notebook-note-item.dragging{opacity:.4;}
+  .notebook-note-item.dragging, .notebook-row.dragging{opacity:.4;}
+  .notebook-note-item.drop-before{box-shadow:inset 0 2px 0 var(--primary);}
+  .notebook-note-item.drop-after{box-shadow:inset 0 -2px 0 var(--primary);}
+  .notebook-row.drop-before{box-shadow:inset 0 2px 0 var(--primary);}
+  .notebook-row.drop-after{box-shadow:inset 0 -2px 0 var(--primary);}
   .notebook-add-note-btn{
     font-size:12px; color:var(--ink-soft); padding:7px 8px; border-radius:6px; text-align:left;
     background:var(--bg); border:1px solid var(--border); width:100%; margin-top:2px;
@@ -1635,38 +1645,40 @@
         <div class="view-title" id="viewTitle">Tarefas</div>
         <div class="view-subtitle" id="viewSubtitle" style="display:none;"></div>
       </div>
-      <div class="search-wrap" id="searchWrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" id="searchInput" placeholder="Buscar...">
-        <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-      </div>
-      <button class="notification-btn" id="notificationBtn" title="Notificações">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-      </button>
-      <div class="topbar-avatar-wrap" id="topbarAvatarWrap">
-        <button class="topbar-avatar-btn" id="topbarAvatarBtn" title="Conta">
-          <span class="profile-avatar" id="profileAvatarTopbar"></span>
+      <div class="topbar-right-group">
+        <div class="search-wrap" id="searchWrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Buscar...">
+          <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        </div>
+        <button class="notification-btn" id="notificationBtn" title="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
         </button>
-        <div class="avatar-dropdown-menu" id="avatarDropdownMenu" style="display:none;">
-          <div class="avatar-dropdown-header">
-            <span class="profile-avatar" id="profileAvatarDropdown"></span>
-            <div class="profile-info">
-              <div class="profile-name" id="profileNameDropdown">Seu nome</div>
-              <div class="profile-email" id="profileEmailDropdown">seu@email.com</div>
+        <div class="topbar-avatar-wrap" id="topbarAvatarWrap">
+          <button class="topbar-avatar-btn" id="topbarAvatarBtn" title="Conta">
+            <span class="profile-avatar" id="profileAvatarTopbar"></span>
+          </button>
+          <div class="avatar-dropdown-menu" id="avatarDropdownMenu" style="display:none;">
+            <div class="avatar-dropdown-header">
+              <span class="profile-avatar" id="profileAvatarDropdown"></span>
+              <div class="profile-info">
+                <div class="profile-name" id="profileNameDropdown">Seu nome</div>
+                <div class="profile-email" id="profileEmailDropdown">seu@email.com</div>
+              </div>
             </div>
+            <button type="button" class="avatar-dropdown-item" id="avatarMenuProfileBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Perfil
+            </button>
+            <button type="button" class="avatar-dropdown-item" id="avatarMenuSettingsBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+              Configurações
+            </button>
+            <button type="button" class="avatar-dropdown-item danger" id="avatarMenuLogoutBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+              Sair
+            </button>
           </div>
-          <button type="button" class="avatar-dropdown-item" id="avatarMenuProfileBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            Perfil
-          </button>
-          <button type="button" class="avatar-dropdown-item" id="avatarMenuSettingsBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-            Configurações
-          </button>
-          <button type="button" class="avatar-dropdown-item danger" id="avatarMenuLogoutBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-            Sair
-          </button>
         </div>
       </div>
     </div>
@@ -1760,6 +1772,7 @@ let pendingNotePrefillTaskId = null;
 let pendingNoteNotebookId = null;
 const expandedNotebookIds = new Set();
 let draggedNoteId = null;
+let draggedNotebookId = null;
 let searchTerm = '';
 let fileHandle = null;
 let dirty = false;
@@ -3847,7 +3860,8 @@ const RT_ICONS = {
   alignRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M10 12h10M6 18h14"/></svg>',
   bulletList: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="4.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1.4" fill="currentColor" stroke="none"/><path d="M9.5 6h10M9.5 12h10M9.5 18h10"/></svg>',
   numberList: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.6" font-family="sans-serif"><text x="1.5" y="8.5" font-size="7">1</text><text x="1.5" y="14.5" font-size="7">2</text><text x="1.5" y="20.5" font-size="7">3</text><path d="M9.5 6h10M9.5 12h10M9.5 18h10" stroke-width="2" fill="none"/></svg>',
-  clearFormat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H8l-6-6a2 2 0 010-3l9-9a2 2 0 013 0l7 7a2 2 0 010 3l-8 8"/><path d="M12.5 6.5l7 7"/><line x1="4" y1="21" x2="20" y2="21"/></svg>'
+  clearFormat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H8l-6-6a2 2 0 010-3l9-9a2 2 0 013 0l7 7a2 2 0 010 3l-8 8"/><path d="M12.5 6.5l7 7"/><line x1="4" y1="21" x2="20" y2="21"/></svg>',
+  indent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 6h8M13 12h8M13 18h8M3 6h4"/><path d="M3 12l4 3-4 3z" fill="currentColor" stroke="none"/></svg>'
 };
 
 function clearFormattingInSelection(targetEl){
@@ -3889,18 +3903,33 @@ function clearFormattingInSelection(targetEl){
     }
     if(!el || el === targetEl) return;
     const top = topLevelAncestor(el) || el;
-    const lines = nodeToLines(top);
-    if(lines.every(l => !l)) return;
-    const frag = buildFragmentFromLines(lines);
-    const lastNew = frag.lastChild;
-    top.parentNode.replaceChild(frag, top);
-    if(lastNew){
-      const newRange = document.createRange();
-      newRange.selectNodeContents(lastNew);
-      newRange.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(newRange);
-    }
+
+    // Isola apenas a linha onde está o cursor (entre os <br> que a delimitam dentro do
+    // bloco), sem tocar nas demais linhas do mesmo bloco nem recriar a estrutura dele.
+    const childNodes = Array.from(top.childNodes);
+    const isBr = n => n.nodeType === 1 && n.tagName === 'BR';
+    let cursorChild = range.startContainer;
+    while(cursorChild && cursorChild.parentNode !== top) cursorChild = cursorChild.parentNode;
+    let cursorIndex = cursorChild ? childNodes.indexOf(cursorChild) : -1;
+    if(cursorIndex === -1) cursorIndex = 0;
+
+    let segStart = 0;
+    for(let i = cursorIndex; i >= 0; i--){ if(isBr(childNodes[i])){ segStart = i+1; break; } }
+    let segEnd = childNodes.length;
+    for(let i = cursorIndex; i < childNodes.length; i++){ if(isBr(childNodes[i])){ segEnd = i; break; } }
+    const segNodes = childNodes.slice(segStart, segEnd);
+    const text = segNodes.map(n => n.textContent || '').join('');
+    if(!text) return;
+
+    const textNode = document.createTextNode(text);
+    top.insertBefore(textNode, segNodes[0]);
+    segNodes.forEach(n => { if(n.parentNode === top) top.removeChild(n); });
+
+    const newRange = document.createRange();
+    newRange.setStart(textNode, textNode.length);
+    newRange.setEnd(textNode, textNode.length);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
     return;
   }
 
@@ -4009,15 +4038,29 @@ function makeRtFormatSelect(targetEl){
       ensureSelectionInTarget(targetEl);
     }
     document.execCommand('formatBlock', false, select.value);
-    select.value = 'P';
   });
-  return select;
+  function sync(){
+    if(!targetEl) return;
+    const sel = window.getSelection();
+    if(!sel || !sel.rangeCount) return;
+    const node = sel.getRangeAt(0).startContainer;
+    if(!targetEl.contains(node)) return;
+    let el = node.nodeType === 1 ? node : node.parentNode;
+    let tag = 'P';
+    while(el && el !== targetEl){
+      if(/^(H1|H2|H3)$/.test(el.tagName)){ tag = el.tagName; break; }
+      el = el.parentNode;
+    }
+    select.value = tag;
+  }
+  return { element: select, sync };
 }
 
 function buildRichToolbar(targetEl){
   const bar = document.createElement('div');
   bar.className = 'rt-toolbar';
-  bar.appendChild(makeRtFormatSelect(targetEl));
+  const formatSelect = makeRtFormatSelect(targetEl);
+  bar.appendChild(formatSelect.element);
   const sep0 = document.createElement('span'); sep0.className='rt-sep'; bar.appendChild(sep0);
 
   const tracked = [];
@@ -4027,6 +4070,7 @@ function buildRichToolbar(targetEl){
       try{ isActive = document.queryCommandState(cmd); }catch(e){}
       btn.classList.toggle('active', isActive);
     });
+    formatSelect.sync();
   }
   function addTracked(cmd, btn){ tracked.push({ cmd, btn }); bar.appendChild(btn); }
 
@@ -4040,6 +4084,7 @@ function buildRichToolbar(targetEl){
   const sep2 = document.createElement('span'); sep2.className='rt-sep'; bar.appendChild(sep2);
   addTracked('insertUnorderedList', makeRtButton({ icon:'bulletList', cmd:'insertUnorderedList', title:'Marcadores' }, targetEl, updateActiveStates));
   addTracked('insertOrderedList', makeRtButton({ icon:'numberList', cmd:'insertOrderedList', title:'Numeração' }, targetEl, updateActiveStates));
+  bar.appendChild(makeRtButton({ icon:'indent', cmd:'indent', title:'Aumentar recuo (Tab)' }, targetEl, updateActiveStates));
   const sep3 = document.createElement('span'); sep3.className='rt-sep'; bar.appendChild(sep3);
   const clearFormatBtn = document.createElement('button');
   clearFormatBtn.type = 'button';
@@ -4136,6 +4181,14 @@ function attachFormattedPaste(targetEl){
   });
 }
 
+function attachTabIndent(targetEl){
+  targetEl.addEventListener('keydown', (e) => {
+    if(e.key !== 'Tab') return;
+    e.preventDefault();
+    try{ document.execCommand(e.shiftKey ? 'outdent' : 'indent'); }catch(err){}
+  });
+}
+
 function stripHtml(html){
   const tmp = document.createElement('div');
   tmp.innerHTML = html || '';
@@ -4175,7 +4228,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
       <div class="rt-toolbar-slot"></div>
       <span class="note-toolbar-sep"></span>
       <div class="note-meta-row">
-        <span class="group-current-chip" id="noteGroupChip"></span>
         <button type="button" class="note-attach-btn" id="composerAttachBtn" title="Anexar imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.19 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
         <input type="file" id="composerAttachInput" accept="image/*" multiple style="display:none;">
         <button type="button" class="note-linked-task-btn" id="noteLinkedTaskBtn" title="Vincular tarefa">
@@ -4190,6 +4242,7 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
   const bodyInputEl = composer.querySelector('.note-body-input');
   if(isEditing) bodyInputEl.innerHTML = existingNote.body || '';
   attachFormattedPaste(bodyInputEl);
+  attachTabIndent(bodyInputEl);
   const toolbarEl = buildRichToolbar(bodyInputEl);
   composer.querySelector('.rt-toolbar-slot').replaceWith(toolbarEl);
 
@@ -4224,10 +4277,6 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
 
   function renderNoteGroupChip(){
     const cat = catById(noteCategoryId);
-    const chip = composer.querySelector('#noteGroupChip');
-    chip.style.background = cat ? cat.color + '22' : 'var(--surface-2)';
-    chip.style.color = cat ? cat.color : 'var(--ink-soft)';
-    chip.innerHTML = `<span class="cat-swatch" style="background:${cat?cat.color:'var(--ink-faint)'}"></span>${escapeHtml(cat?cat.name:'Sem espaço')}`;
     const nb = noteNotebookId ? state.notebooks.find(x => x.id === noteNotebookId) : null;
     const spaceSeg = composer.querySelector('#noteBreadcrumbSpace');
     const notebookSeg = composer.querySelector('#noteBreadcrumbNotebook');
@@ -4349,8 +4398,17 @@ function buildNoteComposer(existingNote, prefillTaskId, forcedNotebookId){
     state.lastActiveNoteBySpace[composerSpaceKeyAtOpen] = targetNote ? targetNote.id : createdNoteRef.id;
     persistOnly();
   }
-  composer.querySelector('.note-title').addEventListener('blur', commit);
+  const titleInputEl = composer.querySelector('.note-title');
+  titleInputEl.addEventListener('blur', commit);
   bodyInput.addEventListener('blur', commit);
+  let titleLiveTimer = null;
+  titleInputEl.addEventListener('input', () => {
+    clearTimeout(titleLiveTimer);
+    titleLiveTimer = setTimeout(() => {
+      commit();
+      if(currentView === 'notes') renderNotes();
+    }, 500);
+  });
 
   return { element: composer, commit };
 }
@@ -4364,12 +4422,24 @@ function openNoteComposer(existingNote, prefillTaskId){
     pendingNoteNotebookId = null;
     if(existingNote.notebookId) expandedNotebookIds.add(existingNote.notebookId);
   } else {
+    // caderno de destino, em ordem de preferência: nota atualmente aberta > caderno
+    // selecionado (expandido mais recentemente) no espaço > primeiro caderno do espaço
+    const previousActiveNote = activeNoteId ? state.notes.find(x => x.id === activeNoteId) : null;
     activeNoteId = null;
     creatingNewNote = true;
     pendingNotePrefillTaskId = prefillTaskId || null;
     const prefillTask = prefillTaskId ? state.tasks.find(x => x.id === prefillTaskId) : null;
-    const catId = prefillTask ? prefillTask.categoryId : (activeCategoryFilter || state.categories[0].id);
-    let nb = state.notebooks.find(x => x.categoryId === catId);
+    const catId = prefillTask ? prefillTask.categoryId : (previousActiveNote ? previousActiveNote.categoryId : (activeCategoryFilter || state.categories[0].id));
+    let nb = null;
+    if(prefillTask){
+      nb = state.notebooks.find(x => x.categoryId === catId);
+    } else if(previousActiveNote && previousActiveNote.notebookId){
+      nb = state.notebooks.find(x => x.id === previousActiveNote.notebookId);
+    }
+    if(!nb){
+      const expandedInSpace = state.notebooks.filter(x => x.categoryId === catId && expandedNotebookIds.has(x.id));
+      nb = expandedInSpace[expandedInSpace.length-1] || state.notebooks.find(x => x.categoryId === catId);
+    }
     if(!nb){
       nb = { id: uid('nb'), name: 'Notas', categoryId: catId, createdAt: Date.now() };
       state.notebooks.push(nb);
@@ -5479,6 +5549,8 @@ function closeNotebookMenu(){
 
 function renderNotes(){
   const view = document.getElementById('notesView');
+  const titleWasFocused = document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('note-title');
+  const titleCursor = titleWasFocused ? document.activeElement.selectionStart : null;
   view.innerHTML = '';
 
   const term = searchTerm.trim().toLowerCase();
@@ -5489,7 +5561,7 @@ function renderNotes(){
 
   const spaceNotebooks = state.notebooks
     .filter(nb => !activeCategoryFilter || nb.categoryId === activeCategoryFilter)
-    .sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+    .sort((a,b) => (a.notebookOrder!=null?a.notebookOrder:(a.createdAt||0)) - (b.notebookOrder!=null?b.notebookOrder:(b.createdAt||0)));
 
   // se o espaço mudou desde o último render, soltar a nota ativa para restaurar a do novo espaço
   if(lastRenderedNoteSpaceKey !== null && lastRenderedNoteSpaceKey !== noteSpaceKey()){
@@ -5515,13 +5587,14 @@ function renderNotes(){
   const notebooksCol = document.createElement('div');
   notebooksCol.className = 'notebooks-col';
   notebooksCol.style.width = (state.notebooksColWidth || 260) + 'px';
+  function noteOrderOf(n){ return n.noteOrder!=null ? n.noteOrder : (n.createdAt||0); }
   function notebookGroupHtml(nb){
     const nbNotes = state.notes.filter(n => n.notebookId === nb.id && !n.archived && matches(n))
-      .sort((a,b) => (b.pinned - a.pinned) || ((b.pinnedAt||0) - (a.pinnedAt||0)) || (b.updatedAt - a.updatedAt));
+      .sort((a,b) => (b.pinned - a.pinned) || (noteOrderOf(a) - noteOrderOf(b)));
     const expanded = expandedNotebookIds.has(nb.id);
     return `
       <div class="notebook-group">
-        <div class="notebook-row" data-nb-id="${nb.id}">
+        <div class="notebook-row" data-nb-id="${nb.id}" draggable="true">
           <svg class="notebook-chevron ${expanded?'expanded':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           <svg class="notebook-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
           <span class="notebook-name">${escapeHtml(nb.name && nb.name.trim() ? nb.name : 'Caderno sem nome')}</span>
@@ -5529,8 +5602,8 @@ function renderNotes(){
           <button type="button" class="notebook-menu-btn" data-nb-id="${nb.id}" title="Opções"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/></svg></button>
         </div>
         ${expanded ? `
-        <div class="notebook-notes">
-          ${nbNotes.map(n => `<div class="notebook-note-item ${n.id===activeNoteId?'active':''} ${n.pinned?'is-pinned':''}" data-note-id="${n.id}" draggable="true">${n.pinned?`<svg class="nb-note-pin" data-unpin-note-id="${n.id}" title="Desafixar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 17v5M9 10.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V16a1 1 0 001 1h12a1 1 0 001-1v-.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V7a1 1 0 011-1 2 2 0 000-4H8a2 2 0 000 4 1 1 0 011 1z"/></svg>`:''}<span>${escapeHtml(n.title||'Sem título')}</span></div>`).join('')}
+        <div class="notebook-notes" data-nb-id="${nb.id}">
+          ${nbNotes.map(n => `<div class="notebook-note-item ${n.id===activeNoteId?'active':''} ${n.pinned?'is-pinned':''}" data-note-id="${n.id}" draggable="true"><button type="button" class="nb-note-pin-btn ${n.pinned?'pinned':''}" data-pin-note-id="${n.id}" title="${n.pinned?'Desafixar':'Fixar'}">${pinIconSvg(n.pinned)}</button><span>${escapeHtml(n.title||'Sem título')}</span></div>`).join('')}
           <button type="button" class="notebook-add-note-btn" data-nb-id="${nb.id}">+ Nova nota</button>
         </div>` : ''}
       </div>
@@ -5605,6 +5678,13 @@ function renderNotes(){
   layout.appendChild(notebooksCol);
   layout.appendChild(detailCol);
   view.appendChild(layout);
+  if(titleWasFocused){
+    const newTitle = detailCol.querySelector('.note-title');
+    if(newTitle){
+      newTitle.focus();
+      if(titleCursor != null) newTitle.setSelectionRange(titleCursor, titleCursor);
+    }
+  }
 
   function selectNote(noteId){
     if(currentNoteComposerCommit) currentNoteComposerCommit();
@@ -5623,29 +5703,65 @@ function renderNotes(){
       else expandedNotebookIds.add(id);
       renderNotes();
     });
-    row.addEventListener('dragover', (e) => {
-      if(!draggedNoteId) return;
-      e.preventDefault();
-      row.classList.add('drag-over');
+    row.addEventListener('dragstart', (e) => {
+      e.stopPropagation();
+      draggedNotebookId = row.dataset.nbId;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
     });
-    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('dragend', () => {
+      draggedNotebookId = null;
+      row.classList.remove('dragging');
+      notebooksCol.querySelectorAll('.drop-before,.drop-after').forEach(el => el.classList.remove('drop-before','drop-after'));
+    });
+    row.addEventListener('dragover', (e) => {
+      if(draggedNoteId){
+        e.preventDefault();
+        row.classList.add('drag-over');
+      } else if(draggedNotebookId && draggedNotebookId !== row.dataset.nbId){
+        e.preventDefault();
+        const rect = row.getBoundingClientRect();
+        const isBefore = (e.clientY - rect.top) < rect.height/2;
+        row.classList.toggle('drop-before', isBefore);
+        row.classList.toggle('drop-after', !isBefore);
+      }
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over','drop-before','drop-after'));
     row.addEventListener('drop', (e) => {
       e.preventDefault();
-      row.classList.remove('drag-over');
-      if(!draggedNoteId) return;
-      const n = state.notes.find(x => x.id === draggedNoteId);
-      const nb = state.notebooks.find(x => x.id === row.dataset.nbId);
-      if(!n || !nb || n.notebookId === nb.id) return;
-      if(currentNoteComposerCommit) currentNoteComposerCommit();
-      n.notebookId = nb.id;
-      expandedNotebookIds.add(nb.id);
-      markDirty();
-      renderNotes();
+      const isBefore = row.classList.contains('drop-before');
+      row.classList.remove('drag-over','drop-before','drop-after');
+      if(draggedNoteId){
+        const n = state.notes.find(x => x.id === draggedNoteId);
+        const nb = state.notebooks.find(x => x.id === row.dataset.nbId);
+        if(!n || !nb || n.notebookId === nb.id) return;
+        if(currentNoteComposerCommit) currentNoteComposerCommit();
+        n.notebookId = nb.id;
+        n.categoryId = nb.categoryId;
+        expandedNotebookIds.add(nb.id);
+        markDirty();
+        renderNotes();
+      } else if(draggedNotebookId && draggedNotebookId !== row.dataset.nbId){
+        const draggedNb = state.notebooks.find(x => x.id === draggedNotebookId);
+        const targetNb = state.notebooks.find(x => x.id === row.dataset.nbId);
+        if(!draggedNb || !targetNb || draggedNb.categoryId !== targetNb.categoryId) return;
+        const siblingsSorted = state.notebooks.filter(x => x.categoryId === targetNb.categoryId)
+          .sort((a,b) => (a.notebookOrder!=null?a.notebookOrder:(a.createdAt||0)) - (b.notebookOrder!=null?b.notebookOrder:(b.createdAt||0)));
+        const withoutDragged = siblingsSorted.filter(x => x.id !== draggedNb.id);
+        let idx = withoutDragged.findIndex(x => x.id === targetNb.id);
+        if(idx < 0) idx = withoutDragged.length;
+        if(!isBefore) idx += 1;
+        withoutDragged.splice(idx, 0, draggedNb);
+        withoutDragged.forEach((x,i) => { x.notebookOrder = i; });
+        markDirty();
+        renderNotes();
+      }
     });
   });
   notebooksCol.querySelectorAll('.notebook-note-item[data-note-id]').forEach(item => {
     item.addEventListener('click', () => selectNote(item.dataset.noteId));
     item.addEventListener('dragstart', (e) => {
+      e.stopPropagation();
       draggedNoteId = item.dataset.noteId;
       item.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
@@ -5653,16 +5769,50 @@ function renderNotes(){
     item.addEventListener('dragend', () => {
       draggedNoteId = null;
       item.classList.remove('dragging');
-      notebooksCol.querySelectorAll('.notebook-row.drag-over').forEach(r => r.classList.remove('drag-over'));
+      notebooksCol.querySelectorAll('.drag-over,.drop-before,.drop-after').forEach(el => el.classList.remove('drag-over','drop-before','drop-after'));
+    });
+    item.addEventListener('dragover', (e) => {
+      if(!draggedNoteId || draggedNoteId === item.dataset.noteId) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = item.getBoundingClientRect();
+      const isBefore = (e.clientY - rect.top) < rect.height/2;
+      item.classList.toggle('drop-before', isBefore);
+      item.classList.toggle('drop-after', !isBefore);
+    });
+    item.addEventListener('dragleave', () => item.classList.remove('drop-before','drop-after'));
+    item.addEventListener('drop', (e) => {
+      if(!draggedNoteId || draggedNoteId === item.dataset.noteId) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const isBefore = item.classList.contains('drop-before');
+      item.classList.remove('drop-before','drop-after');
+      const targetNote = state.notes.find(n => n.id === item.dataset.noteId);
+      const draggedNote = state.notes.find(n => n.id === draggedNoteId);
+      if(!targetNote || !draggedNote) return;
+      if(currentNoteComposerCommit) currentNoteComposerCommit();
+      draggedNote.notebookId = targetNote.notebookId;
+      draggedNote.categoryId = targetNote.categoryId;
+      const nbNotesSorted = state.notes.filter(n => n.notebookId === targetNote.notebookId && !n.archived)
+        .sort((a,b) => (b.pinned - a.pinned) || (noteOrderOf(a) - noteOrderOf(b)));
+      const withoutDragged = nbNotesSorted.filter(n => n.id !== draggedNote.id);
+      let idx = withoutDragged.findIndex(n => n.id === targetNote.id);
+      if(idx < 0) idx = withoutDragged.length;
+      if(!isBefore) idx += 1;
+      withoutDragged.splice(idx, 0, draggedNote);
+      withoutDragged.forEach((n,i) => { n.noteOrder = i; });
+      expandedNotebookIds.add(targetNote.notebookId);
+      markDirty();
+      renderNotes();
     });
   });
-  notebooksCol.querySelectorAll('.nb-note-pin[data-unpin-note-id]').forEach(pin => {
+  notebooksCol.querySelectorAll('.nb-note-pin-btn[data-pin-note-id]').forEach(pin => {
     pin.addEventListener('click', (e) => {
       e.stopPropagation();
-      const n = state.notes.find(x => x.id === pin.dataset.unpinNoteId);
+      const n = state.notes.find(x => x.id === pin.dataset.pinNoteId);
       if(!n) return;
-      n.pinned = false;
-      n.pinnedAt = null;
+      n.pinned = !n.pinned;
+      n.pinnedAt = n.pinned ? Date.now() : null;
       if(currentNoteComposerCommit) currentNoteComposerCommit();
       markDirty();
       renderNotes();
