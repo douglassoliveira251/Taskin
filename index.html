@@ -1511,8 +1511,8 @@
     display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin:14px 0 5px;
   }
   .profile-form label:first-of-type{margin-top:4px;}
-  .profile-form input[type=text], .profile-form input[type=email]{
-    width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 11px; font-size:14px;
+  .profile-form input[type=text], .profile-form input[type=email], .profile-form input[type=password]{
+    width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 11px; font-size:14px; box-sizing:border-box;
   }
   .profile-form input:focus{outline:none; border-color:var(--primary);}
 
@@ -1564,6 +1564,7 @@
     .sidebar{display:none;}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -1686,6 +1687,13 @@
   </div>
 </div>
 
+<!-- MODAL LOGIN (nuvem) -->
+<div class="overlay" id="loginOverlay" style="background:var(--bg);">
+  <div class="modal" id="loginModalBody" style="width:360px;">
+    <!-- preenchido via JS -->
+  </div>
+</div>
+
 <!-- MODAL VINCULAR ARQUIVO BASE -->
 <div class="overlay" id="linkOverlay">
   <div class="modal" id="linkModalBody">
@@ -1755,6 +1763,15 @@ let draggedNoteId = null;
 let searchTerm = '';
 let fileHandle = null;
 let dirty = false;
+
+/* ===================== NUVEM (Supabase) ===================== */
+const SUPABASE_URL = 'https://ppbigpokjoahkjmacclu.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_2i5Tl-U2PeRgOgbbqe4ZzA_4hzTdXuS';
+const sbClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+let cloudSession = null;
+let cloudSaveTimer = null;
 let activeTaskId = null;
 let creatingNewTask = false;
 let tagsPopoverOpen = false;
@@ -1927,11 +1944,35 @@ function saveToLocalStorage(){
 let autoSaveTimer = null;
 const AUTOSAVE_DEBOUNCE_MS = 250;
 
+/* Único ponto que agenda a escrita atrasada, seja pra arquivo local ou pra nuvem -
+   markDirty/persistOnly só chamam isto, sem saber qual backend está ativo. */
+function scheduleAutoSave(){
+  if(fileHandle){
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(async () => {
+      try{ await writeStateToFile(); dirty = false; updateFileStatus(); }
+      catch(e){ console.error('Auto-save falhou', e); }
+    }, AUTOSAVE_DEBOUNCE_MS);
+  } else if(cloudSession){
+    clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(async () => {
+      try{ await writeStateToCloud(); dirty = false; updateFileStatus(); }
+      catch(e){ console.error('Auto-save na nuvem falhou', e); }
+    }, AUTOSAVE_DEBOUNCE_MS);
+  }
+}
+
 async function flushAutoSave(){
-  if(!fileHandle || !dirty) return;
-  clearTimeout(autoSaveTimer);
-  try{ await writeStateToFile(); dirty = false; updateFileStatus(); }
-  catch(e){ console.error('Auto-save falhou', e); }
+  if(!dirty) return;
+  if(fileHandle){
+    clearTimeout(autoSaveTimer);
+    try{ await writeStateToFile(); dirty = false; updateFileStatus(); }
+    catch(e){ console.error('Auto-save falhou', e); }
+  } else if(cloudSession){
+    clearTimeout(cloudSaveTimer);
+    try{ await writeStateToCloud(); dirty = false; updateFileStatus(); }
+    catch(e){ console.error('Auto-save na nuvem falhou', e); }
+  }
 }
 
 function markDirty(){
@@ -1939,13 +1980,7 @@ function markDirty(){
   saveToLocalStorage();
   updateFileStatus();
   render();
-  if(fileHandle){
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(async () => {
-      try{ await writeStateToFile(); dirty = false; updateFileStatus(); }
-      catch(e){ console.error('Auto-save falhou', e); }
-    }, AUTOSAVE_DEBOUNCE_MS);
-  }
+  scheduleAutoSave();
 }
 
 /* Salva sem re-renderizar a tela inteira — usado em blur de campos de texto para não
@@ -1954,13 +1989,7 @@ function persistOnly(){
   dirty = true;
   saveToLocalStorage();
   updateFileStatus();
-  if(fileHandle){
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(async () => {
-      try{ await writeStateToFile(); dirty = false; updateFileStatus(); }
-      catch(e){ console.error('Auto-save falhou', e); }
-    }, AUTOSAVE_DEBOUNCE_MS);
-  }
+  scheduleAutoSave();
 }
 
 // Garante que alterações pendentes sejam gravadas antes de a aba ser minimizada,
@@ -1980,10 +2009,13 @@ window.addEventListener('pagehide', () => { commitOpenEditors(); flushAutoSave()
 function updateFileStatus(){
   const dotSettings = document.getElementById('statusDotSettings');
   const textSettings = document.getElementById('statusTextSettings');
-  if(fileHandle){
+  const cls = 'status-dot ' + (dirty ? 'dirty' : 'saved');
+  const title = dirty ? 'Alterações não salvas' : 'Sincronizado';
+  if(cloudSession){
+    if(dotSettings){ dotSettings.className = cls; dotSettings.title = title; }
+    if(textSettings) textSettings.textContent = `${cloudSession.user.email} (nuvem)`;
+  } else if(fileHandle){
     const name = fileHandle.name || 'taskin.json';
-    const cls = 'status-dot ' + (dirty ? 'dirty' : 'saved');
-    const title = dirty ? 'Alterações não salvas' : 'Sincronizado';
     if(dotSettings){ dotSettings.className = cls; dotSettings.title = title; }
     if(textSettings) textSettings.textContent = name;
   } else {
@@ -6275,6 +6307,104 @@ async function writeStateToFile(){
   await writable.close();
 }
 
+/* ===================== NUVEM: persistência ===================== */
+async function loadStateFromCloud(){
+  const { data, error } = await sbClient
+    .from('taskin_state')
+    .select('data')
+    .eq('user_id', cloudSession.user.id)
+    .maybeSingle();
+  if(error) throw error;
+  if(data && data.data && typeof data.data === 'object'){
+    state = data.data;
+  }
+  normalizeState();
+  if(!data){
+    await writeStateToCloud();
+  }
+}
+
+async function writeStateToCloud(){
+  if(!cloudSession) return;
+  const { error } = await sbClient.from('taskin_state').upsert({
+    user_id: cloudSession.user.id,
+    data: state,
+    updated_at: new Date().toISOString()
+  });
+  if(error) throw error;
+}
+
+async function startCloudSession(){
+  try{
+    await loadStateFromCloud();
+  }catch(e){ console.error('Erro ao carregar dados da nuvem', e); }
+  applyTheme();
+  if(state.defaultCategoryFilter) activeCategoryFilter = state.defaultCategoryFilter;
+  if(state.calendarViewDefault) calendarView = state.calendarViewDefault;
+  closeLoginGate();
+  render();
+  updateFileStatus();
+}
+
+function renderLoginGate(errorMsg){
+  const body = document.getElementById('loginModalBody');
+  body.innerHTML = `
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-bottom:18px;">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:40px; height:40px;">
+        <rect x="10" y="12" width="14" height="76" rx="7" fill="#3FA087"/>
+        <rect x="10" y="12" width="70" height="14" rx="7" fill="#3FA087"/>
+        <rect x="29" y="37" width="53" height="10" rx="5" fill="#3FA087"/>
+        <rect x="29" y="56" width="34" height="10" rx="5" fill="#3FA087"/>
+        <path d="M42 76l10 10 28 -28" stroke="#3FA087" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="brand-wordmark" style="font-size:22px;">Taskin</span>
+    </div>
+    <h3 style="text-align:center;">Entrar</h3>
+    ${errorMsg ? `<p style="color:var(--danger); font-size:13px; margin-bottom:10px; text-align:center;">${escapeHtml(errorMsg)}</p>` : ''}
+    <form id="loginForm" class="profile-form">
+      <label>E-mail</label>
+      <input type="email" id="loginEmail" required autocomplete="username">
+      <label>Senha</label>
+      <input type="password" id="loginPassword" required autocomplete="current-password">
+      <button type="submit" class="btn" id="loginSubmitBtn" style="width:100%; justify-content:center; margin-top:16px;">Entrar</button>
+      <button type="button" id="loginForgotBtn" style="width:100%; text-align:center; margin-top:10px; background:none; border:none; color:var(--ink-faint); font-size:12.5px; text-decoration:underline;">Esqueci minha senha</button>
+    </form>
+  `;
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Entrando...';
+    try{
+      const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      cloudSession = data.session;
+      await startCloudSession();
+    }catch(err){
+      console.error(err);
+      renderLoginGate('E-mail ou senha inválidos.');
+    }
+  });
+  document.getElementById('loginForgotBtn').onclick = async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    if(!email){ renderLoginGate('Digite seu e-mail acima e clique em "Esqueci minha senha" de novo.'); return; }
+    try{
+      const { error } = await sbClient.auth.resetPasswordForEmail(email);
+      if(error) throw error;
+      renderLoginGate('Se esse e-mail tiver conta, enviamos um link de redefinição de senha.');
+    }catch(err){
+      console.error(err);
+      renderLoginGate('Não foi possível enviar o e-mail de redefinição agora.');
+    }
+  };
+}
+
+function closeLoginGate(){
+  document.getElementById('loginOverlay').classList.remove('show');
+}
+
 async function linkOpenExisting(){
   try{
     const [handle] = await window.showOpenFilePicker({
@@ -6324,6 +6454,16 @@ function skipLinking(){
 async function disconnectFile(e){
   if(e) e.stopPropagation();
   const anchor = (e && e.currentTarget) || document.getElementById('avatarMenuLogoutBtn') || document.getElementById('topbarAvatarBtn');
+  if(cloudSession){
+    openConfirmPortal(anchor, 'Sair da sua conta? Você vai precisar entrar de novo com seu e-mail e senha.', async () => {
+      try{ await sbClient.auth.signOut(); }catch(e2){ console.error(e2); }
+      cloudSession = null;
+      dirty = false;
+      renderLoginGate();
+      document.getElementById('loginOverlay').classList.add('show');
+    }, 'Sair');
+    return;
+  }
   openConfirmPortal(anchor, 'Desconectar o arquivo base? O sistema ficará indisponível até que você conecte um arquivo novamente.', async () => {
     fileHandle = null;
     await idbDeleteHandle('main');
@@ -6582,6 +6722,21 @@ async function boot(){
   applyTheme();
   if(state.defaultCategoryFilter) activeCategoryFilter = state.defaultCategoryFilter;
   if(state.calendarViewDefault) calendarView = state.calendarViewDefault;
+
+  if(sbClient){
+    try{
+      const { data } = await sbClient.auth.getSession();
+      if(data && data.session){
+        cloudSession = data.session;
+        await startCloudSession();
+        return;
+      }
+    }catch(e){ console.error(e); }
+    render();
+    renderLoginGate();
+    document.getElementById('loginOverlay').classList.add('show');
+    return;
+  }
 
   if(FS_SUPPORTED){
     try{
