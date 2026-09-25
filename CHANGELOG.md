@@ -1,3 +1,11 @@
+## [1.10.044] - 2026-09-25 00:00
+
+### Fixed
+
+#### Sincronização na nuvem
+
+- Bug real corrigido: com o sistema aberto em duas janelas, editar e salvar numa não atualizava os dados carregados na outra — ela continuava com a "foto" antiga do momento em que abriu, e ao editar e salvar algo ali, sua escrita (o dado inteiro) sobrescrevia a mudança feita na primeira janela. Agora, ao voltar para uma janela/aba (ela ganha foco), o sistema busca os dados mais recentes da nuvem antes que você comece a editar ali, desde que não haja nada sendo digitado nem uma escrita pendente — assim a próxima alteração sempre parte do dado mais atual, e a edição feita na outra janela não é mais perdida.
+
 ## [1.10.043] - 2026-09-25 00:00
 
 ### Fixed
