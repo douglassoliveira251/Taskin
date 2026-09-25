@@ -4508,7 +4508,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.044';
+const APP_VERSION = '1.10.045';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -6895,8 +6895,13 @@ function loadUiSession(){
     if(saved && (typeof saved.activeCategoryFilter === 'string' || saved.activeCategoryFilter === null)) activeCategoryFilter = saved.activeCategoryFilter;
   }catch(e){}
 }
+let lastRenderedView = null;
 function render(){
   saveUiSession();
+  if(currentView !== lastRenderedView){
+    lastRenderedView = currentView;
+    refreshFromCloudIfSafe();
+  }
   applySidebarCollapsed();
   renderSpaceSelector();
   document.getElementById('viewTitle').textContent = VIEW_TITLES[currentView];

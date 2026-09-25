@@ -1,3 +1,11 @@
+## [1.10.045] - 2026-09-25 00:00
+
+### Changed
+
+#### Sincronização na nuvem
+
+- A busca automática de dados mais recentes da nuvem (adicionada ao voltar o foco na janela) agora também acontece ao trocar de tela (Visão geral/Tarefas/Notas/Calendário/Configurações) dentro da mesma janela — cobre o caso de ficar um tempo na mesma janela navegando entre telas sem nunca trocar de aba/janela. Mesmas travas de segurança de antes: não busca se houver algo sendo digitado ou uma escrita pendente.
+
 ## [1.10.044] - 2026-09-25 00:00
 
 ### Fixed
