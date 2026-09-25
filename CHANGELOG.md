@@ -1,3 +1,11 @@
+## [1.10.043] - 2026-09-25 00:00
+
+### Fixed
+
+#### Notas
+
+- Bug real corrigido: o corpo da nota só salvava ao perder o foco (clicar fora do campo). Se você digitasse e saísse da tela sem clicar fora antes (trocar de tela, dar refresh), a edição nunca era gravada. Agora o corpo também salva sozinho após 3 segundos sem digitar, igual ao título.
+
 ## [1.10.042] - 2026-09-25 00:00
 
 ### Fixed
