@@ -1,3 +1,12 @@
+## [1.10.054] - 2026-09-25 00:00
+
+### Changed
+
+#### Notas
+
+- Removidos os atalhos de markdown ao digitar (`# `, `- `, `**negrito**`...), a pedido — voltou a ser só texto normal digitar esses caracteres no corpo da nota.
+- Ícone de fixar na lista de notas do caderno reduzido mais uma vez (de 13px para 11px).
+
 ## [1.10.052] - 2026-09-25 00:00
 
 ### Added
