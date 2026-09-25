@@ -1,3 +1,12 @@
+## [1.10.042] - 2026-09-25 00:00
+
+### Fixed
+
+#### Sincronização na nuvem
+
+- Corrigido: editar em duas janelas/dispositivos ao mesmo tempo e atualizar a página podia mostrar dados desatualizados. O salvamento na nuvem tinha um atraso de 250ms (debounce) que um refresh logo em seguida não esperava terminar — a última edição podia nunca chegar a ser gravada. Agora a escrita na nuvem dispara imediatamente a cada alteração, sem atraso artificial, e novas edições que cheguem enquanto uma escrita já está em andamento são enfileiradas (nunca perdidas, nunca escritas em paralelo).
+- A tela e o espaço que você estava vendo (Tarefas/Notas/Calendário/Visão geral + filtro de espaço) agora são restaurados automaticamente após um refresh — cada aba/janela guarda isso de forma independente, então abrir o sistema em duas janelas olhando espaços diferentes não faz uma "roubar" o estado da outra.
+
 ## [1.10.040] - 2026-09-22 00:00
 
 ### Changed
