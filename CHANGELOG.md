@@ -1,3 +1,29 @@
+## [1.10.052] - 2026-09-25 00:00
+
+### Added
+
+#### Notas
+
+- Duplicar nota: novo botão no cabeçalho da nota (antes do de fixar).
+- Exportar nota como Markdown (.md) ou PDF (abre uma janela de impressão para "Salvar como PDF"), pelo novo botão de exportar no cabeçalho.
+- Atalhos de markdown ao digitar no corpo da nota: `# `/`## `/`### ` no início da linha viram título, `- `/`* ` viram lista com marcadores, `1. ` vira lista numerada, e fechar `**texto**`/`*texto*` vira negrito/itálico.
+
+#### Calendário / Tarefas
+
+- Recorrência ganhou um campo opcional "Até" (data fim) — depois dessa data, a tarefa recorrente deixa de gerar a próxima ocorrência ao ser concluída.
+
+### Fixed
+
+#### Notas
+
+- Corrigido: escolher um estilo de título (Normal/Título 1/2/3) no seletor da barra de formatação às vezes não aplicava o formato ao texto selecionado — o valor escolhido podia ser sobrescrito internamente antes de ser usado.
+
+### Changed
+
+#### Notas
+
+- Ícone de fixar reduzido um pouco mais na lista de notas dentro do caderno.
+
 ## [1.10.045] - 2026-09-25 00:00
 
 ### Changed
